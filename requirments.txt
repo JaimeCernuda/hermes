@@ -1,1 +1,2 @@
 processing-py==0.3.7
+Faker
