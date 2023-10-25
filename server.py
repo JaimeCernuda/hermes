@@ -1,26 +1,19 @@
 from flask import Flask, render_template, jsonify
 import random
+from python.generator import generate_metadata
+import logging
 
 app = Flask(__name__)
-
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/data')
-def get_data():
-    nodes = {}
-    for i in range(32):  # Always generate data for 32 nodes
-        node_name = 'ares-comp-{0:02d}'.format(i)
-        nodes[node_name] = {
-            "Memory": random.random(),
-            "Nvme": random.random(),
-            "BB": random.random(),
-            "Pfs": random.random()
-        }
-    return jsonify(nodes)
+@app.route('/metadata')
+def get_metadata():
+    metadata = generate_metadata(num_buckets=3, num_blobs=8, num_targets=4, num_nodes=32)
+    return jsonify(metadata)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3200)
+    app.run(debug=True)
