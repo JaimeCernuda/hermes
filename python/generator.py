@@ -57,7 +57,7 @@ def generate_target(node_id, target_type, target_id):
     }
 
 
-def generate_metadata(num_buckets=5, num_blobs=10, num_targets=4, num_nodes=32, num_traits=5):
+def generate_metadata(num_buckets=5, num_blobs=10, num_targets=4, num_nodes=32, num_traits=2):
     buckets = [generate_bucket(num_blobs, num_traits, bucket_id) for bucket_id in range(num_buckets)]
     blobs = [generate_blob(blob_id, num_targets * num_nodes) for blob_id in range(num_blobs)]
 
