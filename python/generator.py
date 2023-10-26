@@ -1,3 +1,4 @@
+import hashlib
 import json
 import random
 import string
@@ -16,14 +17,15 @@ def generate_blob(blob_id, num_targets):
     size = random.randint(1, 1000)
     score = random.randint(1, 100)
     access_frequency = round(random.uniform(0, 1), 2)
+
+    random.seed()  # Resetting the seed
+
     target_id = random.randint(0, num_targets-1)
 
     buffer_info = {
         "target_id": target_id,
         "size": size
     }
-
-    random.seed()  # Resetting the seed
 
     return {
         "id": blob_id,
@@ -35,10 +37,13 @@ def generate_blob(blob_id, num_targets):
 
 
 def generate_bucket(num_blobs, num_traits, bucket_id):
+    random.seed(bucket_id)
     name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    random.seed()
     traits = [''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
               for _ in range(random.randint(0, num_traits))]
     blob_ids = random.sample(range(num_blobs), k=random.randint(1, num_blobs))
+
     return {
         "name": name,
         "id": bucket_id,
@@ -56,6 +61,10 @@ def generate_target(node_id, target_type, target_id):
         "node_id": node_id
     }
 
+def compute_hash(d):
+    json_str = json.dumps(d, sort_keys=True)
+    hash_obj = hashlib.sha256(json_str.encode())
+    return hash_obj.hexdigest()
 
 def generate_metadata(num_buckets=5, num_blobs=10, num_targets=4, num_nodes=32, num_traits=2):
     buckets = [generate_bucket(num_blobs, num_traits, bucket_id) for bucket_id in range(num_buckets)]
@@ -71,7 +80,11 @@ def generate_metadata(num_buckets=5, num_blobs=10, num_targets=4, num_nodes=32, 
         for t in range(num_targets):
             targets.append(generate_target(node_id, target_types[t], len(targets)))
 
+    combined_hash = hashlib.sha256((compute_hash(buckets) + compute_hash(blobs) +
+                                    compute_hash(targets)).encode()).hexdigest()
+
     return {
+        "id": combined_hash,
         "buckets": buckets,
         "blobs": blobs,
         "targets": targets
