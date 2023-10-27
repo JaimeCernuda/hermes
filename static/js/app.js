@@ -42,7 +42,17 @@ let focusedBlobs = [];
 let shouldFocusBuckets = false;
 let shouldFocusBlobs = false;
 
+let blobColorMap = new Map();
+let blob_amt = 0.05;
+
 let img;
+
+const TARGET_COLORS = [
+    "#00d4ff",
+    "#056ab9",
+    "#090979",
+    "#020024",
+];
 
 const colors = [
     "#FF5733", "#33FF57", "#5733FF",
@@ -78,7 +88,8 @@ function setup() {
     WINDOW_HEIGHT = windowHeight;
 
     createCanvas(WINDOW_WIDTH, WINDOW_HEIGHT);
-
+    frameRate(60);
+    adjustVariables();
     const base_x = 10
 
     playPauseButton = createButton('Pause');
@@ -217,7 +228,6 @@ function draw() {
     if (data && data.nodes && prev_data) {
         fill(0);  // Set text color to black
         if(displayHeatmap){
-            console.log("heatmap", displayHeatmap)
             generate_heatmap(data.nodes);
         }
         drawBlobs(data.nodes, data.blobs);
@@ -281,6 +291,16 @@ function setBucketFocusValue(buckets){
 
     dropdown_buckets.removeAttribute('disabled');
 }
+
+function lerpColorArray(c1, c2, amt) {
+    // return [
+    //     lerp(c1[0], c2[0], amt),
+    //     lerp(c1[1], c2[1], amt),
+    //     lerp(c1[2], c2[2], amt)
+    // ];
+    return lerpColor(color(c1), color(c2), amt);
+}
+
 function drawBlobs(nodes, blobs) {
     if (!nodes || !blobs) {
         console.error("Data is undefined");
@@ -291,6 +311,7 @@ function drawBlobs(nodes, blobs) {
     let marginX = left_margin;
     let marginY = bottom_margin - 20;
     let hoveredBlob = null; // To store blob data when hovered
+    let hoveredIndex = 0; // To store blob data when hovered
 
     const nodeEntries = Object.entries(nodes);
 
@@ -324,11 +345,13 @@ function drawBlobs(nodes, blobs) {
             let blobCol = 0;
             let maxBlobsPerRow = Math.floor(cell_width_blobs / 30);
             let exceededHeight = false;
+            let blob_index = 0
 
             blobs.forEach(blob => {
+                // console.log(dropdown_buckets.value(), " ", blobToBucketMap[blob.id].bucketName)
                 if (blob.buffer_info.target_id === targetData.id &&
                     (shouldFocusBlobs === false || (shouldFocusBlobs === true && focusedBlobs.includes(blob.id))) &&
-                    (shouldFocusBuckets === false || (shouldFocusBuckets === true && blob.bucketName === dropdown_buckets.value()))
+                    (shouldFocusBuckets === false || (shouldFocusBuckets === true && blobToBucketMap[blob.id].bucketName === dropdown_buckets.value()))
                 ){
                     let blobX = x + 10 + (blobCol * 30) + blob_stroke_weight/2;
                     let blobY = y + 10 + (blobRow * 30) + blob_stroke_weight/2;
@@ -348,7 +371,26 @@ function drawBlobs(nodes, blobs) {
                             // If you want to add the bucket's name to the blob's details:
                             blob.bucketName = bucketInfo.bucketName;
                         }
-                        fill(0, 0, 255);
+                        let numberOfTargets = Object.keys(targets).length;
+                        let newColor;
+
+                        if (!blobColorMap.has(blob.id)) {
+                            newColor = TARGET_COLORS[blob.buffer_info.target_id % numberOfTargets]
+                            blobColorMap.set(blob.id, newColor);
+                        }
+                        else{
+                            if(isPlaying) {
+                                let currentColor = blobColorMap.get(blob.id);
+                                newColor = lerpColorArray(currentColor, TARGET_COLORS[blob.buffer_info.target_id % numberOfTargets], blob_amt);
+                                blobColorMap.set(blob.id, newColor);
+                            }
+                            else{
+                                newColor = blobColorMap.get(blob.id);
+                            }
+                        }
+
+
+                        fill(newColor);
                         ellipse(blobX, blobY, 20);
 
                         stroke(0)
@@ -361,6 +403,7 @@ function drawBlobs(nodes, blobs) {
                         // Check for hover over blob
                         if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                             hoveredBlob = blob;
+                            hoveredIndex = blob_index;
                         }
 
                         blobCol++;
@@ -370,7 +413,7 @@ function drawBlobs(nodes, blobs) {
                         }
                     }
                 }
-
+                        blob_index++;
             });
 
             if (exceededHeight) {
@@ -387,17 +430,44 @@ function drawBlobs(nodes, blobs) {
 
     // If a blob is hovered over, display its details
     if (hoveredBlob) {
-        displayBlobDetails(hoveredBlob);
+        displayBlobDetails(hoveredBlob, hoveredIndex, nodes);
     }
+    let [nodeName, targets] = nodeEntries[0]
+    displayTargetColors(targets)
 }
 
 
-function displayBlobDetails(blob) {
+function displayTargetColors(targets) {
+    let squareSize = 20;   // Size of the color square
+    let numberOfTargets = Object.keys(targets).length;
+    let xPosition = WINDOW_WIDTH/2 - numberOfTargets/2 * textWidth("Memory");
+    let yPosition = (bottom_margin - 15) + (numberOfTargets * blobTableHeight);
+
+    let targetIndex = 0;
+    Object.entries(targets).forEach(([targetType, targetData]) => {
+        let targetColor = TARGET_COLORS[targetIndex % TARGET_COLORS.length];  // Wrap around if there are more targets than colors
+
+        // Draw the color square
+        fill(targetColor);
+        noStroke();
+        rect(xPosition, yPosition, squareSize, squareSize);  // Drawing the square at fixed x position (50) and variable y position
+
+        // Print the target's name to the left of the square
+        fill(0);  // Black text color
+        textSize(14);
+        text(targetType, xPosition + squareSize + 5, yPosition + squareSize/2 + 5);  // Centering text vertically relative to the square
+
+        xPosition += squareSize + textWidth(targetType) + 10;  // Update y position for the next target
+        targetIndex++;  // Increment the target index
+    });
+}
+
+function displayBlobDetails(blob, index, nodes) {
     push();
     const x = mouseX + 10;  // Offset to not overlap the cursor
     const y = mouseY;
     const width = 150;  // Adjust as necessary
-    const height = 160; // Adjust based on the number of details
+    const height = 180; // Adjust based on the number of details
 
     // Draw a semi-transparent background
     fill(255, 255, 255, 200);
@@ -417,7 +487,66 @@ function displayBlobDetails(blob) {
     if (blob.bucketName) {
         text(`Bucket: ${blob.bucketName}`, x + 10, y + 140);
     }
+
+    // text(`prev ID: ${prev_data.blobs[index].id}`, x + 10, y + 160);
+    text(`prev target: ${prev_data.blobs[index].buffer_info.target_id}`, x + 10, y + 160);
+
+    // Draw arrow for movement
+    let prevTargetPosition = getTargetPosition(nodes, prev_data.blobs[index].buffer_info.target_id);
+    let blobX = mouseX + 10;  // This is the X-coordinate of the blob
+    let blobY = mouseY;      // This is the Y-coordinate of the blob
+
+    let startX, startY;
+
+    if (prevTargetPosition.x > blobX) { // Target is to the right
+        startX = blobX + width;  // right center
+        startY = blobY + height / 2;
+    } else if (prevTargetPosition.x < blobX) { // Target is to the left
+        startX = blobX; // left center
+        startY = blobY + height / 2;
+    } else if (prevTargetPosition.y < blobY) { // Target is above
+        startX = blobX + width / 2;
+        startY = blobY; // top center
+    } else { // Target is below
+        startX = blobX + width / 2;
+        startY = blobY + height; // bottom center
+    }
+
+    stroke(255, 0, 0);  // Red color for the arrow
+    strokeWeight(2);
+    line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
+
+    // Draw the arrowhead (feel free to adjust the size or shape)
+    const arrowSize = 5;
+    const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
+    line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
+    line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
+
     pop();
+}
+
+function getTargetPosition(nodes, targetID) {
+    let nodeIndex = 0;
+    let marginX = left_margin;
+    let marginY = bottom_margin - 20;
+
+    for (let [nodeName, targets] of Object.entries(nodes)) {
+        let targetIndex = 0;
+
+        for (let [targetType, targetData] of Object.entries(targets)) {
+            if (targetData.id === targetID) {
+                let x = marginX + (nodeIndex * cell_width_blobs) + (cell_width_blobs / 2);
+                let y = marginY + (targetIndex * blobTableHeight) + (blobTableHeight / 2);
+                return { x, y };
+            }
+            targetIndex++;
+        }
+
+        nodeIndex++;
+    }
+
+    // If not found, return a default value (for now, you can change this as needed)
+    return { x: 0, y: 0 };
 }
 
 function findTargetByBlobId(targets, targetId) {
@@ -466,6 +595,7 @@ function getColorForBucket(bucketName) {
 function togglePlayPause() {
     isPlaying = !isPlaying;
     playPauseButton.html(isPlaying ? 'Pause' : 'Play');
+    blobColorMap= new Map();
 }
 
 function updateDropdownOptions(numNodes, selectedValue) {
