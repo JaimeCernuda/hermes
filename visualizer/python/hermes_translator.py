@@ -11,11 +11,11 @@ class HermesTranslator:
         targets = []
 
         for bucket in self.hermes_data.tag_info:
-            buckets.append(self.translate_buckets(bucket))
+            buckets.append(self.translate_bucket(bucket))
         for blob in self.hermes_data.blob_info:
-            blobs.append(self.translate_blobs(blob))
+            blobs.append(self.translate_blob(blob))
         for target in self.hermes_data.tgt_info:
-            targets.append(self.translate_targets(target))
+            targets.append(self.translate_target(target))
 
         combined_hash = hashlib.sha256((self.compute_hash(buckets) + self.compute_hash(blobs) +
                                         self.compute_hash(targets)).encode()).hexdigest()
