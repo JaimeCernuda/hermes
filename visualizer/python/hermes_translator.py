@@ -1,66 +1,58 @@
-import hashlib
-import json
+import sys
+import os
+print(os.getenv('PYTHONPATH'))
+from py_hermes import Hermes, TRANSPARENT_HERMES
+class MetadataSnapshot:
+    def __init__(self):
+        TRANSPARENT_HERMES()
+        self.hermes = Hermes()
+        self.blob_info = []
+        self.target_info = []
+        self.tag_info = []
 
+    @staticmethod
+    def unique(id):
+        return f'{id.unique}.{id.node_id}'
 
-class HermesTranslator:
-    def __init__(self, hermes_data):
-        self.hermes_data = hermes_data
+    def collect(self):
+        mdm = self.hermes.CollectMetadataSnapshot()
+        for blob in mdm.blob_info:
+            blob_info = {
+                'name': str(blob.get_name()),
+                'id': self.unique(blob.blob_id),
+                'score': float(blob.score),
+                'access_frequency': 0,
+                'buffer_info': []
+            }
+            for buf in blob.buffers:
+                buf_info = {
+                    'target_id': self.unique(buf.tid),
+                    'size': int(buf.t_size)
+                }
+                blob_info['buffer_info'].append(buf_info)
+            self.blob_info.append(blob_info)
+        for tag in mdm.bkt_info:
+            tag_info = {
+                'id': self.unique(tag.tag_id),
+                'name': str(tag.get_name()),
+                'blobs': [self.unique(blob.blob_id) for blob in tag.blobs]
+            }
+            self.tag_info.append(tag_info)
+        for target in mdm.target_info:
+            target_info = {
+                'name': None,
+                'id':  self.unique(target.tgt_id),
+                'rem_cap': target.rem_cap,
+                'max_cap': target.max_cap,
+                'bandwidth': target.bandwidth,
+                'latency': target.latency,
+                'score': target.score,
+            }
+            self.target_info.append(target_info)
+        self.target_info.sort(reverse=True, key=lambda x: x['bandwidth'])
+        for i, target in enumerate(self.target_info):
+            target['name'] = f'Tier {i}'
 
-        buckets = []
-        blobs = []
-        targets = []
-
-        for bucket in self.hermes_data.tag_info:
-            buckets.append(self.translate_bucket(bucket))
-        for blob in self.hermes_data.blob_info:
-            blobs.append(self.translate_blob(blob))
-        for target in self.hermes_data.tgt_info:
-            targets.append(self.translate_target(target))
-
-        combined_hash = hashlib.sha256((self.compute_hash(buckets) + self.compute_hash(blobs) +
-                                        self.compute_hash(targets)).encode()).hexdigest()
-
-        self.translated = {
-            "id": combined_hash,
-            "buckets": buckets,
-            "blobs": blobs,
-            "targets": targets
-        }
-
-    def translate_blob(self, blob):
-        buffer_info = {
-            "target_id": target_id,  # Int
-            "size": size  # Int
-        }
-
-        return {
-            "id": blob_id,  # int
-            "name": name,  # String
-            "score": score,  # int
-            "access_frequency": access_frequency,  # float
-            "buffer_info": buffer_info
-        }
-
-    def translate_target(self, target):
-        return {
-            "name": target_type,  # The type NVME, Memory, as a string
-            "id": target_id,  # A number
-            "remaining_capacity": remaining_capacity,  # Float
-            "node_id": node_id  # String. ex=ares-comp-01
-        }
-
-    def translate_bucket(self, bucket):
-        return {
-            "name": name,  # A string with the bucker name
-            "id": bucket_id,  # An integer
-            "traits": traits,  # I made it a list of strings, but i dont think i am using it at the moment
-            "blobs": blob_ids  # A list of unique random integers
-        }
-
-    def compute_hash(self, d):
-        json_str = json.dumps(d, sort_keys=True)
-        hash_obj = hashlib.sha256(json_str.encode())
-        return hash_obj.hexdigest()
-
-    def get_traslation(self):
-        return self.translated
+# mdm = MetadataSnapshot()
+# mdm.collect()
+# print('Done')
