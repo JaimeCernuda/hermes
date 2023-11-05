@@ -298,7 +298,9 @@ function draw() {
                 generate_heatmap(data.nodes);
             }
             if(lowerChoice === "Metadata") {
+                push();
                 generate_metadata(data.sql);
+                pop();
             }
         }
     }
@@ -868,7 +870,7 @@ function draw_metadata_row_labels(start_y, labels) {
 }
 
 function generate_metadata(data) {
-    push();
+push();
     let nodeNames = Object.keys(data);
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
@@ -878,57 +880,105 @@ function generate_metadata(data) {
 
     textSize(14);
 
-    // Loop over the selected nodes
     for (let i = 0; i < HEATMAP_NODES; i++) {
         let nodeName = nodeNames[i];
-
-        // Draw column labels
         fill('black');
         noStroke();
         textAlign(CENTER, CENTER);
         text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
 
         let stepData = data[nodeName];
-
         selectedSteps.forEach(step => {
             let key = step.toString();
-            if (stepData && stepData.hasOwnProperty(key)) {
-                actual_steps.push(step);
-                let y = start_y + actual_steps.indexOf(step) * metadata_cell_height;
-
-                // Draw rectangles for each step
-                fill(200);
-                stroke(0);
-                rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
-
-                Object.keys(stepData[key]).forEach((variable, varIndex) => {
-                    let variableData = stepData[key][variable];
-                    let blobX = left_margin + i * cell_width_metadata + varIndex * 20; // Space out blobs horizontally
-
-                    // Draw min ellipse
-                    fill(100);
-                    ellipse(blobX, y + metadata_cell_height / 2, 15);
-                    fill('white');
-                    text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, blobX, y + metadata_cell_height / 2);
-
-                    // Draw max ellipse
-                    fill(150);
-                    ellipse(blobX + 10, y + metadata_cell_height / 2, 15);
-                    fill('white');
-                    text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, blobX + 10, y + metadata_cell_height / 2);
-
-                    // Draw variable name
-                    fill('black');
-                    noStroke();
-                    textSize(10);
-                    text(variable, blobX + 5, y + metadata_cell_height);
-                });
+            if (stepData && stepData.hasOwnProperty(key) && !actual_steps.includes(step)) {
+                actual_steps.push(step); // Ensure no duplicate steps
             }
+        });
+
+        actual_steps.forEach((step, index) => {
+            let y = start_y + index * metadata_cell_height;
+            fill(200);
+            stroke(0);
+            rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
+
+            let stepVariables = stepData[step];
+            let variablesKeys = Object.keys(stepVariables);
+            let spacing = cell_width_metadata / variablesKeys.length; // Dynamic spacing based on number of variables
+
+            variablesKeys.forEach((variable, varIndex) => {
+                let variableData = stepVariables[variable];
+                let baseX = left_margin + i * cell_width_metadata + varIndex * spacing;
+                let blobX = baseX + spacing / 4; // Adjust spacing for the blobs
+                let textX = blobX + spacing / 2; // Center text under the blobs
+
+                // Draw min ellipse
+                fill('skyblue'); // Choose a more interesting color
+                ellipse(blobX, y + metadata_cell_height / 2, 15);
+                fill('white');
+                textSize(10); // Ensure text size is set before drawing text
+                text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, textX, y + metadata_cell_height - 10);
+
+                // Draw max ellipse
+                fill('salmon'); // Choose a different color for max
+                ellipse(blobX + spacing / 2, y + metadata_cell_height / 2, 15);
+                fill('white');
+                textSize(10);
+                text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, textX, y + metadata_cell_height);
+
+                // Draw variable name
+                fill('black');
+                noStroke();
+                textSize(12);
+                text(variable, textX, y - 10); // Adjust the y value to draw the name above the circles
+            });
         });
     }
 
-    // Handle global data in a similar manner if necessary
-    // Similar code to above adjusted for global data...
+    let nodeName = "global";
+
+    // Draw column labels
+    fill('black');
+    noStroke();
+    textAlign(CENTER, CENTER);
+    text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
+
+    let stepData = data[nodeName];
+
+    selectedSteps.forEach(step => {
+        let key = step.toString();
+        if (stepData && stepData.hasOwnProperty(key)) {
+            actual_steps.push(step);
+            let y = start_y + actual_steps.indexOf(step) * metadata_cell_height;
+
+            // Draw rectangles for each step
+            fill(200);
+            stroke(0);
+            rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
+
+            Object.keys(stepData[key]).forEach((variable, varIndex) => {
+                let variableData = stepData[key][variable];
+                let blobX = left_margin + i * cell_width_metadata + varIndex * 20; // Space out blobs horizontally
+
+                // Draw min ellipse
+                fill(100);
+                ellipse(blobX, y + metadata_cell_height / 2, 15);
+                fill('white');
+                text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, blobX, y + metadata_cell_height / 2);
+
+                // Draw max ellipse
+                fill(150);
+                ellipse(blobX + 10, y + metadata_cell_height / 2, 15);
+                fill('white');
+                text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, blobX + 10, y + metadata_cell_height / 2);
+
+                // Draw variable name
+                fill('black');
+                noStroke();
+                textSize(10);
+                text(variable, blobX + 5, y + metadata_cell_height);
+            });
+        }
+    });
 
     draw_metadata_row_labels(start_y, actual_steps);
 
