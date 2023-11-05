@@ -869,72 +869,69 @@ function draw_metadata_row_labels(start_y, labels) {
 
 function generate_metadata(data) {
     push();
-    let nodeNames = Object.keys(data).filter(name => name.startsWith('ares-comp-')); // Assumes all nodes start with 'ares-comp-'
+    let nodeNames = Object.keys(data);
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
     let actual_steps = [];
 
-    // Draw nodes and global data
-    for (let i = 0; i <= HEATMAP_NODES; i++) { // Including an extra iteration for the global column
-        let nodeName = i < HEATMAP_NODES ? nodeNames[i] : 'global';
+    textSize(14);
+
+    // Loop over the selected nodes
+    for (let i = 0; i < HEATMAP_NODES; i++) {
+        let nodeName = nodeNames[i];
+
+        // Draw column labels
+        fill('black');
+        noStroke();
+        textAlign(CENTER, CENTER);
+        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
+
         let stepData = data[nodeName];
 
-        // Draw column labels for each node including global
-        fill('black');
-        textSize(14);
-        noStroke();
-        textAlign(CENTER, CENTER); // Adjust text alignment to center
-        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - 5);
-
-        if (!Array.isArray(selectedSteps)) {
-            console.log("Selected Steps Updated:", selectedSteps);
-            return; // Exit the function if selectedSteps is not an array
-        }
-        // Process each step
-        selectedSteps.forEach((step, index) => {
+        selectedSteps.forEach(step => {
             let key = step.toString();
-            if (stepData && stepData[key]) {
-                // Get all variables for the step
-                Object.keys(stepData[key]).forEach(variable => {
-                    let varData = stepData[key][variable];
-                    // Check and draw for min and max
-                    if (varData.min && varData.max) {
-                        // Get info for min and max
-                        let minInfo = getBlobBucketInfo(varData.min.blob, varData.min.bucket);
-                        let maxInfo = getBlobBucketInfo(varData.max.blob, varData.max.bucket);
-                        console.log("minInfo:", minInfo);
-                        console.log("MaxInfo:", maxInfo);
-                        // Draw circles and text for min and max
-                        let yPos = start_y + index * metadata_cell_height + metadata_cell_height / 2;
+            if(stepData.hasOwnProperty(key)) {
+                actual_steps.push(step);
+                let y = start_y + actual_steps.indexOf(step) * metadata_cell_height;
 
-                        // Min circle and text
-                        fill('blue'); // Example color for min
-                        ellipse(left_margin + i * cell_width_metadata + cell_width_metadata / 4, yPos, 10, 10);
-                        fill('black');
-                        textSize(8);
-                        text(`${varData.min.blob} ${minInfo.id}`, left_margin + i * cell_width_metadata + cell_width_metadata / 4, yPos + 15);
+                // Draw rectangles for each step
+                fill(200);
+                stroke(0);
+                rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
 
-                        // Max circle and text
-                        fill('red'); // Example color for max
-                        ellipse(left_margin + i * cell_width_metadata + 3 * cell_width_metadata / 4, yPos, 10, 10);
-                        fill('black');
-                        textSize(8);
-                        text(`${varData.max.blob} ${maxInfo.id}`, left_margin + i * cell_width_metadata + 3 * cell_width_metadata / 4, yPos + 15);
-                    }
+                Object.keys(stepData[key]).forEach((variable, varIndex) => {
+                    let variableData = stepData[key][variable];
+                    let blobX = left_margin + i * cell_width_metadata + varIndex * 20; // Space out blobs horizontally
+
+                    // Draw min ellipse
+                    fill(100);
+                    ellipse(blobX, y + metadata_cell_height / 2, 15);
+                    fill('white');
+                    text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, blobX, y + metadata_cell_height / 2);
+
+                    // Draw max ellipse
+                    fill(150);
+                    ellipse(blobX + 10, y + metadata_cell_height / 2, 15);
+                    fill('white');
+                    text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, blobX + 10, y + metadata_cell_height / 2);
+
+                    // Draw variable name
+                    fill('black');
+                    noStroke();
+                    textSize(10);
+                    text(variable, blobX + 5, y + metadata_cell_height);
                 });
-
-                // Add to actual steps if not already included
-                if (!actual_steps.includes(step)) {
-                    actual_steps.push(step);
-                }
             }
         });
     }
 
-    // Draw labels for each step
+    // Handle global data in a similar manner if necessary
+    // Similar code to above adjusted for global data...
+
     draw_metadata_row_labels(start_y, actual_steps);
+
     pop();
 }
 
