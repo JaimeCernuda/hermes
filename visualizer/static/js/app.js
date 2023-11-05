@@ -871,6 +871,11 @@ function draw_metadata_row_labels(start_y, labels) {
 
 function generate_metadata(data) {
     push();
+    let metadata_cell_height = cell_height / 2;
+    let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
+    let metadata_height = limitSteps * metadata_cell_height;
+    let start_y = height - bottom_margin - metadata_height;
+
     let nodeNames = Object.keys(data);
 
     let actual_steps = [];
