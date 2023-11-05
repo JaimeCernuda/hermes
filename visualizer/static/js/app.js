@@ -913,6 +913,7 @@ function getBlobBucketInfo(blob, bucket) {
 }
 
 function draw_row(nodeName, actual_steps, i, stepData){
+    console.log("StepData", stepData)
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
@@ -957,20 +958,20 @@ function draw_row(nodeName, actual_steps, i, stepData){
             let maxBlob;
             console.log(variableData.min)
             console.log(variableData.max)
-            if(variableData.min) {
-                minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-            }
-            if(variableData.max) {
-                maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-            }
-
             // Ensure text fits and is centered
             textSize(10); // Smaller text size for better fit
             textAlign(CENTER, TOP); // Center text horizontally and align to top vertically
             fill('white');
-            text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
-            text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+            if(variableData.min) {
+                minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
+                text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
 
+            }
+            if(variableData.max) {
+                maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
+                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+
+            }
             // Variable name text
             fill('black');
             textSize(10);
