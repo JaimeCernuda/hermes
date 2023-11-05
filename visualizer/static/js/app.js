@@ -819,7 +819,7 @@ function generate_heatmap(data) {
         let nodeData = data[col];
         for (let key in nodeData) {
             let target = nodeData[key];
-            let value = target.cap
+            let value = 1 - target.cap
             fill(get_cell_color(value));
             rect(left_margin + i * cell_width_heatmap, start_y + Object.keys(nodeData).indexOf(key) * cell_height, cell_width_heatmap, cell_height);
 
