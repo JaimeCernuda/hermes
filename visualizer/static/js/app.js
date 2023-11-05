@@ -916,7 +916,7 @@ function getBlobBucketInfo(blob, bucket) {
 }
 
 function draw_row(nodeName, actual_steps, i, stepData){
-    let metadata_cell_height = cell_height / 2.1;
+    let metadata_cell_height = cell_height / (limitSteps/4);
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
@@ -995,16 +995,16 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
 function draw_blob_arrow(startX, startY, destX, destY){
     push();
-    let blobX = startX;  // This is the X-coordinate of the blob
-    let blobY = startY - 10;      // This is the Y-coordinate of the blob
+    let arrow_startX = startX;  // This is the X-coordinate of the blob
+    let arrow_startY = startY - 10;      // This is the Y-coordinate of the blob
 
     stroke(255, 0, 0);  // Red color for the arrow
     strokeWeight(2);
-    line(blobX, blobY, destX, destY);
+    line(arrow_startX, arrow_startY, destX, destY);
 
     // Draw the arrowhead (feel free to adjust the size or shape)
     const arrowSize = 5;
-    const angle = atan2(blobY - destY, blobX - startX);
+    const angle = atan2(arrow_startX - destY, arrow_startY - startX);
     // line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
     // line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
     pop();
