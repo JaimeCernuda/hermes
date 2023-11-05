@@ -968,7 +968,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString()), blobY + blobDiameter/2);
+                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2 + 3, blobY + blobDiameter/2);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                         draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                     }
@@ -977,7 +977,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString()), blobY + blobDiameter/2);
+                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2 + 3, blobY + blobDiameter/2);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
@@ -987,7 +987,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX - blobDiameter / 2 + 5, blobY - textPadding);
+            text(variable, blobX - blobDiameter / 2 + 3, blobY + textPadding);
         });
     });
     pop();
@@ -1005,7 +1005,7 @@ function draw_blob_arrow(startX, startY, destX, destY){
     // Draw the arrowhead (feel free to adjust the size or shape)
     const arrowSize = 5;
     const angle = atan2(blobY - destY, blobX - startX);
-    line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
-    line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
+    // line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
+    // line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
     pop();
 }
