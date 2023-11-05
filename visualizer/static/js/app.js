@@ -924,7 +924,7 @@ function getBlobBucketInfo(blob, bucket) {
 function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cell_width_metadata, metadata_height, start_y){
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 10; // Padding between blob and its text label
+    const textPadding = 12; // Padding between blob and its text label
 
 
     push();
@@ -969,7 +969,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY);
+                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY - 2.5);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                         draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                     }
@@ -978,7 +978,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2, blobY);
+                    text(maxBlob.id.toString(), blobX2, blobY - 2.5);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
@@ -988,7 +988,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX + blobDiameter/2 + blobPadding/2 - textWidth(variable) , blobY + blobDiameter/2 + textPadding);
+            text(variable, blobX + blobDiameter/2 + blobPadding/2 - textWidth(variable)/2 , blobY + blobDiameter/2 + textPadding);
         });
     });
     pop();
