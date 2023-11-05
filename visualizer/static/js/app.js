@@ -967,16 +967,16 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2 + 5, blobY + 5);
+                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY + 5);
                 if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
-                    draw_arrow(blobX, blobY, minBlob.x, minBlob.y)
+                    draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                 }
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2, blobY + 5);
                 if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
-                    draw_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
+                    draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                 }
             }
             // Variable name text
@@ -984,18 +984,13 @@ function draw_row(nodeName, actual_steps, i, stepData){
             textSize(10);
             textAlign(LEFT, BOTTOM);
             text(variable, blobX - blobDiameter / 2 + 5, y + metadata_cell_height - textPadding);
-
-
-            if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
-                hoveredBlob = blob;
-                hoveredIndex = blob_index;
-            }
         });
     });
     pop();
 }
 
-function draw_arrow(startX, startY, destX, destY){
+function draw_blob_arrow(startX, startY, destX, destY){
+    push();
     let blobX = startX + 10;  // This is the X-coordinate of the blob
     let blobY = startY;      // This is the Y-coordinate of the blob
 
@@ -1008,4 +1003,5 @@ function draw_arrow(startX, startY, destX, destY){
     const angle = atan2(destY - blobY, startX - blobX);
     line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
     line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
+    pop();
 }
