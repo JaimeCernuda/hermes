@@ -85,11 +85,23 @@ class SQLParser:
                     else:
                         # Aggregate the global min and max
                         if op_name == 'min':
-                            global_results[step][var_name][op_name]['value'] = min(
-                                global_results[step][var_name][op_name]['value'], value)
+                            if global_results[step][var_name][op_name]['value']  > value:
+                                global_results[step][var_name] = {
+                                    op_name: {
+                                        'blob': var_data[op_name]['blob'],
+                                        'bucket': var_data[op_name]['bucket'],
+                                        'value': value
+                                    }
+                                }
                         elif op_name == 'max':
-                            global_results[step][var_name][op_name]['value'] = max(
-                                global_results[step][var_name][op_name]['value'], value)
+                            if global_results[step][var_name][op_name]['value'] < value:
+                                global_results[step][var_name] = {
+                                    op_name: {
+                                        'blob': var_data[op_name]['blob'],
+                                        'bucket': var_data[op_name]['bucket'],
+                                        'value': value
+                                    }
+                                }
 
         # Append the global results to transformed_data
         transformed_data['global'] = global_results
