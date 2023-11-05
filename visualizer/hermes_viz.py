@@ -12,7 +12,7 @@ def is_valid_file(parser, arg):
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
-        return open(arg, 'r')  # return an open file handle
+        return arg  # Now it returns a file path as a string
 
 parser = argparse.ArgumentParser(description="Run a Flask application")
 parser.add_argument('--port', type=int, default=5000, help='Port to run the Flask application on')
