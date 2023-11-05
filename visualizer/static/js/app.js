@@ -51,6 +51,7 @@ let lowerChoice = "Heatmap"
 let selectedSteps = [1,2,3,4]
 let limitSteps = 8
 let input_step_focus
+let blobPositionMap = new Map();
 
 const TARGET_COLORS = [
     "#00d4ff",
@@ -867,58 +868,47 @@ function draw_metadata_row_labels(start_y, labels) {
 
 function generate_metadata(data) {
     push();
-    let nodeNames = Object.keys(data);
+    let nodeNames = Object.keys(data).filter(name => name !== "global"); // Exclude 'global' from this list
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
-    let actual_steps = new Set(); // Use a Set to avoid duplicate step entries
+    let actual_steps = [];
 
-    // Loop over the top HEATMAP_NODES nodes
-    for (let i = 0; i < HEATMAP_NODES && i < nodeNames.length; i++) {
+    // Draw metadata for each node
+    for (let i = 0; i < Math.min(HEATMAP_NODES, nodeNames.length); i++) { // Ensure we don't exceed HEATMAP_NODES or available nodes
         let nodeName = nodeNames[i];
-        // Draw column labels
+        let stepData = data[nodeName];
+        // Draw column labels for each node
         fill('black');
         textSize(14);
         noStroke();
         text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
 
-        let stepData = data[nodeName];
-        // Check steps within the limit
-        for (let j = 0; j < selectedSteps.length; j++) {
-            let stepKey = selectedSteps[j].toString();
-            if (stepData.hasOwnProperty(stepKey)) {
-                actual_steps.add(selectedSteps[j]); // Add to actual_steps if this step is present
-                let stepIndex = Object.keys(stepData).indexOf(stepKey); // Find the index of the step
-                // Draw the rectangle for the step if it's within limitSteps
-                if (stepIndex < limitSteps) {
-                    rect(left_margin + i * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+        // Draw cells for selected steps if they exist
+        for (let j = 0; j < selectedSteps.length; j++) { // Iterate over selectedSteps, not the stepData
+            let step = selectedSteps[j];
+            if (stepData.hasOwnProperty(step)) { // Check if the step exists
+                if (!actual_steps.includes(step)) { // Add the step to actual_steps if it's not already there
+                    actual_steps.push(step);
                 }
-            }
-        }
-    }
-
-    let nodeName = "global";
-    // Draw column labels
-    fill('black');
-    textSize(14);
-    noStroke();
-    text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
-
-    let stepData = data[nodeName];
-    // Check steps within the limit
-    for (let j = 0; j < selectedSteps.length; j++) {
-        let stepKey = selectedSteps[j].toString();
-        if (stepData.hasOwnProperty(stepKey)) {
-            actual_steps.add(selectedSteps[j]); // Add to actual_steps if this step is present
-            let stepIndex = Object.keys(stepData).indexOf(stepKey); // Find the index of the step
-            // Draw the rectangle for the step if it's within limitSteps
-            if (stepIndex < limitSteps) {
+                let stepIndex = actual_steps.indexOf(step); // Find the index of the current step in actual_steps
                 rect(left_margin + i * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
             }
         }
     }
 
+    // Handle the global node similarly
+    let globalData = data['global'];
+    for (let j = 0; j < selectedSteps.length; j++) {
+        let step = selectedSteps[j];
+        if (globalData.hasOwnProperty(step)) {
+            let stepIndex = actual_steps.indexOf(step);
+            rect(left_margin + nodeNames.length * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+        }
+    }
+
+    // Draw the row labels using actual_steps
     draw_metadata_row_labels(start_y, actual_steps);
 
     pop();
