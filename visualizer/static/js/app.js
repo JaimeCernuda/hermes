@@ -120,9 +120,9 @@ function setup() {
     lowSelector = createSelect('Mode');
     lowSelector.changed(selectMode);
     lowSelector.position(base_x, checkbox_heatmap.y + checkbox_heatmap.height + 10);
-    dropdown_heatmap.option("Heatmap");
-    dropdown_heatmap.option("Metadata");
-    dropdown_heatmap.selected("Heatmap");
+    lowSelector.option("Heatmap");
+    lowSelector.option("Metadata");
+    lowSelector.selected("Heatmap");
 
     checkbox_focus_bucket = createCheckbox('FC Buck', false);
     checkbox_focus_bucket.position(base_x, lowSelector.y + lowSelector.height + 10);
