@@ -20,8 +20,16 @@ class SQLParser:
     def fetch_data_from_nodes(self):
         node_outputs = self.exec_on_nodes()
         all_data = {}
+        errors = {}
         for node_name, node_output in node_outputs.stdout.items():
-            all_data[node_name] = self.parse_node_output(node_output)
+            if "Error: Database file not found" in node_output:
+                errors[node_name] = "Database file not found."
+            elif "Parse error" in node_output and "no such table" in node_output:
+                errors[node_name] = "Table does not exist in the database."
+            elif not node_output.strip():
+                errors[node_name] = "Table exists but is empty."
+            else:
+                all_data[node_name] = self.parse_node_output(node_output)
         return all_data
 
     def parse_node_output(self, output):
@@ -50,6 +58,8 @@ class SQLParser:
 
     def get_transformed_data(self):
         raw_data = self.fetch_data_from_nodes()
+        if not raw_data:
+            return {}
         transformed_data = {node: self.transform_data(rows) for node, rows in raw_data.items()}
         return self.append_global_results(transformed_data)
 

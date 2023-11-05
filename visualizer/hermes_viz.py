@@ -20,7 +20,7 @@ parser.add_argument('--real', type=bool, default=False, help='Generate data or c
 parser.add_argument("--hostfile", dest="hostfile", required=True,
                     help="hostfile with nodes under which we are running", metavar="FILE",
                     type=lambda x: is_valid_file(parser, x))
-parser.add_argument("--db_path", dest="db_path", required=True,
+parser.add_argument("--db_path", dest="db_path",
                     help="path to the database to gather the metadata", metavar="FILE",
                     type=lambda x: is_valid_file(parser, x))
 

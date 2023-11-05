@@ -76,11 +76,13 @@ class MetadataSnapshot:
         json_str = json.dumps(d, sort_keys=True)
         hash_obj = hashlib.sha256(json_str.encode())
         return hash_obj.hexdigest()
+
     def generate_metadata(self):
         self.collect()
         targets = self.transform_targets()
         buckets = self.transform_tag_info()
         blobs = self.transform_blob_info()
+
         combined_hash = hashlib.sha256((self.compute_hash(buckets) +
                                         self.compute_hash(blobs) +
                                         self.compute_hash(targets)).encode()).hexdigest()
