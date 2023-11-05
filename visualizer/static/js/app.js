@@ -590,13 +590,13 @@ function displayBlobDetails(blob, index, nodes) {
 
         stroke(255, 0, 0);  // Red color for the arrow
         strokeWeight(2);
-        line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
-
-        // Draw the arrowhead (feel free to adjust the size or shape)
-        const arrowSize = 5;
-        const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
-        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
-        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
+        // line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
+        //
+        // // Draw the arrowhead (feel free to adjust the size or shape)
+        // const arrowSize = 5;
+        // const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
+        // line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
+        // line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
     }
 
     pop();
@@ -857,21 +857,21 @@ function generate_heatmap(data) {
     pop();
 }
 
-function draw_metadata_row_labels(start_y, labels) {
+function draw_metadata_row_labels(start_y, labels, metadata_cell_height) {
     push();
     fill(0);
     noStroke();
     textSize(14);
     for (let i = 0; i < labels.length; i++) {
         //textAlign(CENTER, CENTER);
-        text('step ' + labels[i].toString(), left_margin - 50 - textWidth(labels[i]) / 2, start_y + i * cell_height/ 2 + cell_height / 4);
+        text('step ' + labels[i].toString(), left_margin - 50 - textWidth(labels[i]) / 2, start_y + i * metadata_cell_height/ 2 );
     }
     pop();
 }
 
 function generate_metadata(data) {
     push();
-    let metadata_cell_height = cell_height / (limitSteps/4);
+    let metadata_cell_height = cell_height / 2.1;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
@@ -898,7 +898,7 @@ function generate_metadata(data) {
         }
         draw_row("global", actual_steps, HEATMAP_NODES, data["global"]);
     }
-    draw_metadata_row_labels(start_y, actual_steps);
+    draw_metadata_row_labels(start_y, actual_steps, metadata_cell_height);
 
     pop();
 }
@@ -916,7 +916,7 @@ function getBlobBucketInfo(blob, bucket) {
 }
 
 function draw_row(nodeName, actual_steps, i, stepData){
-    let metadata_cell_height = cell_height / (limitSteps/4);
+    let metadata_cell_height = cell_height / 2.1;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
