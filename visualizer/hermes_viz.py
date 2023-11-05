@@ -18,10 +18,9 @@ parser = argparse.ArgumentParser(description="Run a Flask application")
 parser.add_argument('--port', type=int, default=5000, help='Port to run the Flask application on')
 parser.add_argument('--sleep_time', type=float, default=0.5, help='Sleep time for the /metadata route')
 parser.add_argument('--real', type=bool, default=False, help='Generate data or capture form hermes')
-parser.add_argument("--hostfile", dest="hostfile", required=True,
-                    help="hostfile with nodes under which we are running", metavar="FILE",
-                    type=lambda x: is_valid_file(parser, x))
-parser.add_argument("--db_path", dest="db_path",
+parser.add_argument("--hostfile", dest="hostfile", required=True, type=str,
+                    help="hostfile with nodes under which we are running", metavar="FILE")
+parser.add_argument("--db_path", dest="db_path", type=str,
                     help="path to the database to gather the metadata", metavar="FILE")
 
 args = parser.parse_args()
