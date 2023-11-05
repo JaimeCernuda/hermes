@@ -52,6 +52,7 @@ let selectedSteps = [1,2,3,4]
 let limitSteps = 8
 let input_step_focus
 let blobPositionMap = new Map();
+let lookup = {};
 
 const TARGET_COLORS = [
     "#00d4ff",
@@ -416,6 +417,7 @@ function drawBlobs(nodes, blobs) {
             let maxBlobsPerRow = Math.floor(cell_width_blobs / 30);
             let exceededHeight = false;
             let blob_index = 0
+            lookup = {};
 
             blobs.forEach(blob => {
                 // console.log(dropdown_buckets.value(), " ", blobToBucketMap[blob.id].bucketName)
@@ -425,7 +427,7 @@ function drawBlobs(nodes, blobs) {
                 ){
                     let blobX = x + 10 + (blobCol * 30) + blob_stroke_weight/2;
                     let blobY = y + 10 + (blobRow * 30) + blob_stroke_weight/2;
-
+                    addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY);
                     if (blobY + 20 > y + blobTableHeight) {
                         exceededHeight = true;
                         return;
@@ -868,53 +870,109 @@ function draw_metadata_row_labels(start_y, labels) {
 
 function generate_metadata(data) {
     push();
-    console.log(data);
-    let nodeNames = Object.keys(data).filter(name => name !== "global"); // Exclude 'global' from this list
+    let nodeNames = Object.keys(data).filter(name => name.startsWith('ares-comp'));
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
-    let actual_steps = [];
+    let actual_steps = new Set();
 
-    // Draw metadata for each node
-    for (let i = 0; i < Math.min(HEATMAP_NODES, nodeNames.length); i++) { // Ensure we don't exceed HEATMAP_NODES or available nodes
+    // Loop over the HEATMAP_NODES
+    for (let i = 0; i < HEATMAP_NODES; i++) {
         let nodeName = nodeNames[i];
-        let stepData = data[nodeName];
-        // Draw column labels for each node
+        // Draw column labels
         fill('black');
         textSize(14);
         noStroke();
-        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
+        textAlign(CENTER, BOTTOM);
+        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - 5);
 
-        // Draw cells for selected steps if they exist
-        for (let j = 0; j < selectedSteps.length; j++) { // Iterate over selectedSteps, not the stepData
-            let step = selectedSteps[j];
-            if (stepData.hasOwnProperty(step)) { // Check if the step exists
-                if (!actual_steps.includes(step)) { // Add the step to actual_steps if it's not already there
-                    actual_steps.push(step);
-                }
-                let stepIndex = actual_steps.indexOf(step); // Find the index of the current step in actual_steps
-                rect(left_margin + i * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+        let stepData = data[nodeName];
+        // Process each selected step
+        selectedSteps.forEach(step => {
+            let key = step.toString();
+            if (stepData && stepData[key]) {
+                actual_steps.add(step);
+                let stepIndex = Object.keys(stepData).indexOf(key);
+                let cellX = left_margin + i * cell_width_metadata;
+                let cellY = start_y + stepIndex * metadata_cell_height;
+
+                // Draw the 'min' circle
+                fill('blue'); // Color for min
+                ellipse(cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2, 10, 10);
+                let minInfo = getBlobBucketInfo(stepData[key].min.blob, stepData[key].min.bucket);
+                fill('black');
+                textSize(8);
+                textAlign(CENTER, TOP);
+                text(stepData[key].min.blob, cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 6);
+                text(minInfo.id, cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 15);
+
+                // Draw the 'max' circle
+                fill('red'); // Color for max
+                ellipse(cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2, 10, 10);
+                let maxInfo = getBlobBucketInfo(stepData[key].max.blob, stepData[key].max.bucket);
+                fill('black');
+                textSize(8);
+                textAlign(CENTER, TOP);
+                text(stepData[key].max.blob, cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 6);
+                text(maxInfo.id, cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 15);
             }
-        }
+        });
     }
 
-    // Handle the global node similarly
-    let globalData = data['global'];
-    if (globalData) {
-        for (let j = 0; j < selectedSteps.length; j++) {
-            let step = selectedSteps[j];
-            if (globalData.hasOwnProperty(step)) {
-                let stepIndex = actual_steps.indexOf(step);
-                rect(left_margin + nodeNames.length * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+    let globalStepData = data['global'];
+    if (globalStepData) {
+        // Draw global column label
+        fill('black');
+        textSize(14);
+        noStroke();
+        textAlign(CENTER, BOTTOM);
+        text('global', left_margin + HEATMAP_NODES * cell_width_metadata + cell_width_metadata / 2, start_y - 5);
+
+        // Process each selected step for global data
+        selectedSteps.forEach(step => {
+            let key = step.toString();
+            if (globalStepData[key]) {
+                actual_steps.add(step);
+                let stepIndex = Object.keys(globalStepData).indexOf(key);
+                let cellX = left_margin + HEATMAP_NODES * cell_width_metadata;
+                let cellY = start_y + stepIndex * metadata_cell_height;
+
+                // Draw the 'min' circle for global
+                fill('blue'); // Color for min
+                ellipse(cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2, 10, 10);
+                let minInfo = getBlobBucketInfo(globalStepData[key].min.blob, globalStepData[key].min.bucket);
+                fill('black');
+                textSize(8);
+                textAlign(CENTER, TOP);
+                text(globalStepData[key].min.blob, cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 6);
+                text(minInfo.id, cellX + cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 15);
+
+                // Draw the 'max' circle for global
+                fill('red'); // Color for max
+                ellipse(cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2, 10, 10);
+                let maxInfo = getBlobBucketInfo(globalStepData[key].max.blob, globalStepData[key].max.bucket);
+                fill('black');
+                textSize(8);
+                textAlign(CENTER, TOP);
+                text(globalStepData[key].max.blob, cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 6);
+                text(maxInfo.id, cellX + 3 * cell_width_metadata / 4, cellY + metadata_cell_height / 2 + 15);
             }
-        }
-    } else {
-    console.error("Global data is undefined");
+        });
     }
 
-    // Draw the row labels using actual_steps
-    draw_metadata_row_labels(start_y, actual_steps);
+    // Draw metadata row labels (steps)
+    draw_metadata_row_labels(start_y, Array.from(actual_steps));
 
     pop();
+}
+
+function addBlobBucket(blob, bucket, id, x, y) {
+    let key = `${blob}-${bucket}`;
+    lookup[key] = { id, x, y };
+}
+
+function getBlobBucketInfo(blob, bucket) {
+    let key = `${blob}-${bucket}`;
+    return lookup[key]; // This will return undefined if the key does not exist
 }
