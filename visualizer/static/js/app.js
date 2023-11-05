@@ -923,7 +923,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 10; // Padding between blob and its text label
+    const textPadding = 15; // Padding between blob and its text label
 
 
     push();
@@ -950,12 +950,13 @@ function draw_row(nodeName, actual_steps, i, stepData){
             let textX = blobX + blobDiameter / 2; // Center text under the blob
 
             // Draw min ellipse
-            let y_blob_padding = 5;
+            let y_blob_padding = 3;
+            let blobY = y + metadata_cell_height / 2 - y_blob_padding;
             fill('green');
-            ellipse(blobX, y + metadata_cell_height / 2 - y_blob_padding, blobDiameter);
+            ellipse(blobX, blobY, blobDiameter);
             // Draw max ellipse
             fill('red');
-            ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2 - y_blob_padding, blobDiameter);
+            ellipse(blobX + blobDiameter + blobPadding, blobY, blobDiameter);
 
             let minBlob;
             let maxBlob;
@@ -965,19 +966,19 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), blobX + textWidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
+                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY + 2.5);
 
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding + textWidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
+                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding - textWidth(minBlob.id.toString())/2, blobY + 2.5);
 
             }
             // Variable name text
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX - blobDiameter / 2, y + metadata_cell_height - textPadding);
+            text(variable, blobX - blobDiameter / 2 - 5, y + metadata_cell_height - textPadding);
         });
     });
     pop();
