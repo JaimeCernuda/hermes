@@ -144,7 +144,7 @@ function setup() {
     input_blob_focus.size(70, 20)
 
     input_step_focus = createInput('1-8');
-    input_step_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 300);
+    input_step_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 10);
     input_step_focus.input(inputStepEvent);
     input_step_focus.size(70, 20)
 }
@@ -255,10 +255,11 @@ function checkboxHeatmapEvent() {
   if (checkbox_heatmap.checked()) {
     displayHeatmap = true;
     lowSelector.removeAttribute('disabled');
+    lowerChoice = lowSelector.value();
   } else {
     displayHeatmap = false;
     lowSelector.attribute('disabled', '');
-
+    lowerChoice = "";
   }
   adjustVariables();
 }
@@ -867,54 +868,58 @@ function draw_metadata_row_labels(start_y, labels) {
 function generate_metadata(data) {
     push();
     let nodeNames = Object.keys(data);
-    let metadata_cell_height = cell_height/2;
+    let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
-    let actual_steps = [];
+    let actual_steps = new Set(); // Use a Set to avoid duplicate step entries
 
-    // Loop over the top NUM_NODES nodes
-    for (let i = 0; i < HEATMAP_NODES; i++) {
-        let nodeName = nodeNames[i]
+    // Loop over the top HEATMAP_NODES nodes
+    for (let i = 0; i < HEATMAP_NODES && i < nodeNames.length; i++) {
+        let nodeName = nodeNames[i];
         // Draw column labels
-        fill('black');  // Set text color to black
+        fill('black');
         textSize(14);
         noStroke();
         text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
 
         let stepData = data[nodeName];
-        for (let step in selectedSteps) {
-            // let target = nodeData[key];
-            // let value = target.cap
-            key = step.toString();
-            if(stepData[key]) {
-                actual_steps.push(step);
-                rect(left_margin + i * cell_width_metadata, start_y + Object.keys(stepData).indexOf(key) * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+        // Check steps within the limit
+        for (let j = 0; j < selectedSteps.length; j++) {
+            let stepKey = selectedSteps[j].toString();
+            if (stepData.hasOwnProperty(stepKey)) {
+                actual_steps.add(selectedSteps[j]); // Add to actual_steps if this step is present
+                let stepIndex = Object.keys(stepData).indexOf(stepKey); // Find the index of the step
+                // Draw the rectangle for the step if it's within limitSteps
+                if (stepIndex < limitSteps) {
+                    rect(left_margin + i * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+                }
             }
         }
     }
 
     let nodeName = "global";
     // Draw column labels
-    fill('black');  // Set text color to black
+    fill('black');
     textSize(14);
     noStroke();
     text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
 
     let stepData = data[nodeName];
-    for (let step in selectedSteps) {
-        // let target = nodeData[key];
-        // let value = target.cap
-        key = step.toString();
-        if(stepData[key]) {
-            actual_steps.push(step);
-            rect(left_margin + i * cell_width_metadata, start_y + Object.keys(stepData).indexOf(key) * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+    // Check steps within the limit
+    for (let j = 0; j < selectedSteps.length; j++) {
+        let stepKey = selectedSteps[j].toString();
+        if (stepData.hasOwnProperty(stepKey)) {
+            actual_steps.add(selectedSteps[j]); // Add to actual_steps if this step is present
+            let stepIndex = Object.keys(stepData).indexOf(stepKey); // Find the index of the step
+            // Draw the rectangle for the step if it's within limitSteps
+            if (stepIndex < limitSteps) {
+                rect(left_margin + i * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+            }
         }
     }
 
     draw_metadata_row_labels(start_y, actual_steps);
-
-
 
     pop();
 }
