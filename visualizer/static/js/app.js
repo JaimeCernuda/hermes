@@ -41,11 +41,13 @@ let displayHeatmap = true;
 let focusedBlobs = [];
 let shouldFocusBuckets = false;
 let shouldFocusBlobs = false;
+let lowSelector = false;
 
 let blobColorMap = new Map();
 let blob_amt = 0.05;
 
 let img;
+let lowerChoice = "Heatmap"
 
 const TARGET_COLORS = [
     "#00d4ff",
@@ -115,13 +117,19 @@ function setup() {
     checkbox_heatmap.position(base_x, checkbox_buckets.y + checkbox_buckets.height + 10);
     checkbox_heatmap.changed(checkboxHeatmapEvent);
 
+    lowSelector = createSelect('Mode');
+    lowSelector.changed(selectMode);
+    lowSelector.position(base_x, checkbox_heatmap.y + checkbox_heatmap.height + 10);
+    dropdown_heatmap.option("Heatmap");
+    dropdown_heatmap.option("Metadata");
+    dropdown_heatmap.selected("Heatmap");
+
     checkbox_focus_bucket = createCheckbox('FC Buck', false);
-    checkbox_focus_bucket.position(base_x, checkbox_heatmap.y + checkbox_heatmap.height + 10);
+    checkbox_focus_bucket.position(base_x, lowSelector.y + lowSelector.height + 10);
     checkbox_focus_bucket.changed(checkboxFocusBucketEvent);
 
     dropdown_buckets = createSelect('');
     dropdown_buckets.position(base_x, checkbox_focus_bucket.y + checkbox_focus_bucket.height + 10);
-    dropdown_buckets.attribute('disabled', '');
 
     checkbox_focus_blobs = createCheckbox('Fc Blobs', false);
     checkbox_focus_blobs.position(base_x, dropdown_buckets.y + dropdown_buckets.height + 10);
@@ -133,6 +141,11 @@ function setup() {
     input_blob_focus.size(70, 20)
 }
 
+function selectMode(){
+    lowerChoice = lowSelector.value();
+    adjustVariables();
+    redraw();
+}
 function inputBlobEvent() {
     let inputString = this.value(); // This refers to the input element
     let parsedNumbers = [];
@@ -195,8 +208,11 @@ function checkboxBucketEvent() {
 function checkboxHeatmapEvent() {
   if (checkbox_heatmap.checked()) {
     displayHeatmap = true;
+    lowSelector.removeAttribute('disabled');
   } else {
     displayHeatmap = false;
+    lowSelector.attribute('disabled', '');
+
   }
   adjustVariables();
 }
@@ -228,7 +244,12 @@ function draw() {
     if (data && data.nodes && prev_data) {
         fill(0);  // Set text color to black
         if(displayHeatmap){
-            generate_heatmap(data.nodes);
+            if(lowerChoice === "Heatmap") {
+                generate_heatmap(data.nodes);
+            }
+            if(lowerChoice === "Metadata") {
+                // generate_heatmap(data.nodes);
+            }
         }
         drawBlobs(data.nodes, data.blobs);
     }
@@ -267,9 +288,10 @@ function preprocessData(data) {
     }
     const blobs = data.blobs || [];
     const buckets = data.buckets || [];
+    const sql = data.sql || [];
     mapBlobsToBuckets(buckets);
     setBucketFocusValue(buckets)
-    return {data_id, nodes, blobs};
+    return {data_id, nodes, blobs, sql};
 }
 
 ///////////////////////////////////////
