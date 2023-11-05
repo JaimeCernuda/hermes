@@ -919,7 +919,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
     let metadata_cell_height = cell_height / 2.1;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
-    let start_y = height - bottom_margin - metadata_height;
+    let start_y = WINDOW_HEIGHT - bottom_margin - metadata_height;
 
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
@@ -1003,9 +1003,9 @@ function draw_blob_arrow(startX, startY, destX, destY){
     line(arrow_startX, arrow_startY, destX, destY);
 
     // Draw the arrowhead (feel free to adjust the size or shape)
-    const arrowSize = 5;
+    const arrowSize = 10;
     const angle = atan2(arrow_startX - destY, arrow_startY - startX);
-    // line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
-    // line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
+    line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
+    line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
     pop();
 }
