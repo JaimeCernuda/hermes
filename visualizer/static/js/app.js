@@ -590,13 +590,13 @@ function displayBlobDetails(blob, index, nodes) {
 
         stroke(255, 0, 0);  // Red color for the arrow
         strokeWeight(2);
-        // line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
-        //
-        // // Draw the arrowhead (feel free to adjust the size or shape)
-        // const arrowSize = 5;
-        // const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
-        // line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
-        // line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
+        line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
+
+        // Draw the arrowhead (feel free to adjust the size or shape)
+        const arrowSize = 5;
+        const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
+        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
+        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
     }
 
     pop();
@@ -864,17 +864,17 @@ function draw_metadata_row_labels(start_y, labels, metadata_cell_height) {
     textSize(14);
     for (let i = 0; i < labels.length; i++) {
         //textAlign(CENTER, CENTER);
-        text('step ' + labels[i].toString(), left_margin - 50 - textWidth(labels[i]) / 2, start_y + i * metadata_cell_height/ 2 );
+        text('step ' + labels[i].toString(), left_margin - 50 - textWidth(labels[i]) / 2, start_y + i * metadata_cell_height + metadata_cell_height/2);
     }
     pop();
 }
 
 function generate_metadata(data) {
     push();
-    let metadata_cell_height = cell_height / 2.1;
+    let metadata_cell_height = cell_height;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
-    let start_y = height - bottom_margin - metadata_height;
+    let start_y = WINDOW_HEIGHT - bottom_margin - metadata_height;
 
     let nodeNames = Object.keys(data);
 
@@ -894,9 +894,11 @@ function generate_metadata(data) {
 
         for (let i = 0; i < HEATMAP_NODES; i++) {
             let nodeName = nodeNames[i];
-            draw_row(nodeName, actual_steps, i, data[nodeName])
+            draw_row(nodeName, actual_steps, i, data[nodeName],
+            metadata_cell_height, cell_width_metadata, metadata_height, start_y);
         }
-        draw_row("global", actual_steps, HEATMAP_NODES, data["global"]);
+        draw_row("global", actual_steps, HEATMAP_NODES, data["global"],
+            metadata_cell_height, cell_width_metadata, metadata_height, start_y);
     }
     draw_metadata_row_labels(start_y, actual_steps, metadata_cell_height);
 
@@ -915,12 +917,7 @@ function getBlobBucketInfo(blob, bucket) {
     return lookup[key]; // This will return undefined if the key does not exist
 }
 
-function draw_row(nodeName, actual_steps, i, stepData){
-    let metadata_cell_height = cell_height / 2.1;
-    let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
-    let metadata_height = limitSteps * metadata_cell_height;
-    let start_y = WINDOW_HEIGHT - bottom_margin - metadata_height;
-
+function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cell_width_metadata, metadata_height, start_y){
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
     const textPadding = 10; // Padding between blob and its text label
@@ -993,19 +990,19 @@ function draw_row(nodeName, actual_steps, i, stepData){
     pop();
 }
 
-function draw_blob_arrow(startX, startY, destX, destY){
+function draw_blob_arrow(arrow_beginX, arrow_beginY, dest_arrowX, dest_arrowY){
     push();
-    let arrow_startX = startX;  // This is the X-coordinate of the blob
-    let arrow_startY = startY - 10;      // This is the Y-coordinate of the blob
+    let arrow_startX = arrow_beginX;  // This is the X-coordinate of the blob
+    let arrow_startY = arrow_beginY - 10;      // This is the Y-coordinate of the blob
 
     stroke(255, 0, 0);  // Red color for the arrow
     strokeWeight(2);
-    line(arrow_startX, arrow_startY, destX, destY);
+    line(arrow_startX, arrow_startY, dest_arrowX, dest_arrowY);
 
     // Draw the arrowhead (feel free to adjust the size or shape)
-    const arrowSize = 10;
-    const angle = atan2(arrow_startX - destY, arrow_startY - startX);
-    line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
-    line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
+    const arrowSize = 5;
+    const angle = atan2(arrow_startY - dest_arrowY, arrow_startX - dest_arrowX);
+    line(dest_arrowX, dest_arrowY, dest_arrowX + arrowSize * cos(angle + PI / 6), dest_arrowY + arrowSize * sin(angle + PI / 6));
+    line(dest_arrowX, dest_arrowY, dest_arrowX + arrowSize * cos(angle - PI / 6), dest_arrowY + arrowSize * sin(angle - PI / 6));
     pop();
 }
