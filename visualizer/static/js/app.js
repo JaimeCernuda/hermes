@@ -995,8 +995,8 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
 function draw_blob_arrow(startX, startY, destX, destY){
     push();
-    let blobX = startX + 10;  // This is the X-coordinate of the blob
-    let blobY = startY;      // This is the Y-coordinate of the blob
+    let blobX = startX;  // This is the X-coordinate of the blob
+    let blobY = startY - 10;      // This is the Y-coordinate of the blob
 
     stroke(255, 0, 0);  // Red color for the arrow
     strokeWeight(2);
@@ -1004,7 +1004,7 @@ function draw_blob_arrow(startX, startY, destX, destY){
 
     // Draw the arrowhead (feel free to adjust the size or shape)
     const arrowSize = 5;
-    const angle = atan2(destY - blobY, startX - blobX);
+    const angle = atan2(blobY - destY, blobX - startX);
     line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
     line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
     pop();
