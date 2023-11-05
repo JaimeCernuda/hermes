@@ -861,13 +861,14 @@ function draw_metadata_row_labels(start_y, labels) {
     textSize(14);
     for (let i = 0; i < labels.length; i++) {
         //textAlign(CENTER, CENTER);
-        text('step ' + labels[i].toString(), left_margin - 30 - textWidth(labels[i]) / 2, start_y + i * cell_height + cell_height / 2);
+        text('step ' + labels[i].toString(), left_margin - 50 - textWidth(labels[i]) / 2, start_y + i * cell_height/ 2 + cell_height / 4);
     }
     pop();
 }
 
 function generate_metadata(data) {
     push();
+    console.log(data);
     let nodeNames = Object.keys(data).filter(name => name !== "global"); // Exclude 'global' from this list
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
