@@ -969,7 +969,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY - 2.5);
+                    text(minBlob.id.toString(), blobX - 2, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                         draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                     }
@@ -978,7 +978,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2, blobY - 2.5);
+                    text(maxBlob.id.toString(), blobX2 - 2, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
@@ -988,6 +988,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
+            noStroke();
             text(variable, blobX + blobDiameter/2 + blobPadding/2 - textWidth(variable)/2 , blobY + blobDiameter/2 + textPadding);
         });
     });
