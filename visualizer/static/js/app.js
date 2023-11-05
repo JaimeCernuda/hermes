@@ -953,12 +953,15 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill(150);
             ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2, blobDiameter);
 
+            let minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
+            let maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
+
             // Ensure text fits and is centered
             textSize(10); // Smaller text size for better fit
             textAlign(CENTER, TOP); // Center text horizontally and align to top vertically
             fill('white');
-            text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
-            text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+            text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+            text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
 
             // Variable name text
             fill('black');
