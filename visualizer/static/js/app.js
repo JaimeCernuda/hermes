@@ -923,7 +923,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 15; // Padding between blob and its text label
+    const textPadding = 2; // Padding between blob and its text label
 
 
     push();
@@ -947,6 +947,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             // Center the pair of blobs + text in the middle of the cell
             let blobGroupWidth = blobDiameter * 2 + blobPadding;
             let blobX = left_margin + i * cell_width_metadata + (cell_width_metadata - blobGroupWidth) / 2 + varIndex * (blobGroupWidth + textPadding);
+            let blobX2 = blobX + blobDiameter + blobPadding;
             let textX = blobX + blobDiameter / 2; // Center text under the blob
 
             // Draw min ellipse
@@ -956,7 +957,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             ellipse(blobX, blobY, blobDiameter);
             // Draw max ellipse
             fill('red');
-            ellipse(blobX + blobDiameter + blobPadding, blobY, blobDiameter);
+            ellipse(blobX2, blobY, blobDiameter);
 
             let minBlob;
             let maxBlob;
@@ -966,20 +967,45 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY + 2.5);
-
+                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2 + 5, blobY + 5);
+                if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
+                    draw_arrow(blobX, blobY, minBlob.x, minBlob.y)
+                }
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding - textWidth(minBlob.id.toString())/2, blobY + 2.5);
-
+                text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2, blobY + 5);
+                if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
+                    draw_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
+                }
             }
             // Variable name text
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX - blobDiameter / 2 - 5, y + metadata_cell_height - textPadding);
+            text(variable, blobX - blobDiameter / 2 + 5, y + metadata_cell_height - textPadding);
+
+
+            if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
+                hoveredBlob = blob;
+                hoveredIndex = blob_index;
+            }
         });
     });
     pop();
+}
+
+function draw_arrow(startX, startY, destX, destY){
+    let blobX = startX + 10;  // This is the X-coordinate of the blob
+    let blobY = startY;      // This is the Y-coordinate of the blob
+
+    stroke(255, 0, 0);  // Red color for the arrow
+    strokeWeight(2);
+    line(blobX, blobY, destX, destY);
+
+    // Draw the arrowhead (feel free to adjust the size or shape)
+    const arrowSize = 5;
+    const angle = atan2(destY - blobY, startX - blobX);
+    line(destX, destY, destY + arrowSize * cos(angle + PI / 6), destY + arrowSize * sin(angle + PI / 6));
+    line(destX, destY, destY + arrowSize * cos(angle - PI / 6), destY + arrowSize * sin(angle - PI / 6));
 }
