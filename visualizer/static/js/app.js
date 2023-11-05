@@ -950,7 +950,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             let textX = blobX + blobDiameter / 2; // Center text under the blob
 
             // Draw min ellipse
-            let y_blob_padding = 15;
+            let y_blob_padding = 5;
             fill('green');
             ellipse(blobX, y + metadata_cell_height / 2 - y_blob_padding, blobDiameter);
             // Draw max ellipse
@@ -965,12 +965,12 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), blobX + textwidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
+                text(minBlob.id.toString(), blobX + textWidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
 
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding + textwidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
+                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding + textWidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
 
             }
             // Variable name text
