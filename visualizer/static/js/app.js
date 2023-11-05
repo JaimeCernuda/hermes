@@ -292,6 +292,7 @@ function draw() {
 
     if (data && data.nodes && prev_data) {
         fill(0);  // Set text color to black
+        drawBlobs(data.nodes, data.blobs);
         if(displayHeatmap){
             if(lowerChoice === "Heatmap") {
                 generate_heatmap(data.nodes);
@@ -300,7 +301,6 @@ function draw() {
                 generate_metadata(data.sql);
             }
         }
-        drawBlobs(data.nodes, data.blobs);
     }
 }
 
@@ -889,6 +889,10 @@ function generate_metadata(data, selectedSteps, getBlobBucketInfo) {
         textAlign(CENTER, CENTER); // Adjust text alignment to center
         text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - 5);
 
+        if (!Array.isArray(selectedSteps)) {
+            console.error('selectedSteps is not an array:', selectedSteps);
+            return; // Exit the function if selectedSteps is not an array
+        }
         // Process each step
         selectedSteps.forEach((step, index) => {
             let key = step.toString();
