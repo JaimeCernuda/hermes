@@ -892,7 +892,7 @@ function generate_metadata(data) {
 
         selectedSteps.forEach(step => {
             let key = step.toString();
-            if(stepData.hasOwnProperty(key)) {
+            if (stepData && stepData.hasOwnProperty(key)) {
                 actual_steps.push(step);
                 let y = start_y + actual_steps.indexOf(step) * metadata_cell_height;
 
