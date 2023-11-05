@@ -916,7 +916,7 @@ function getBlobBucketInfo(blob, bucket) {
 }
 
 function draw_row(nodeName, actual_steps, i, stepData){
-    let metadata_cell_height = cell_height / 2;
+    let metadata_cell_height = cell_height / 2.1;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
