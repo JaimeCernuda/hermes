@@ -47,8 +47,11 @@ def get_empress_metadata():
 def get_metadata():
     time.sleep(args.sleep_time)
     if args.real:
-        mdm = MetadataSnapshot(args.hostfile)
-        metadata = mdm.generate_metadata()
+        hermes_mdm = MetadataSnapshot(args.hostfile)
+        metadata = hermes_mdm.generate_metadata()
+        sql_mdm = SQLParser(args.db_path, args.hostfile)
+        sql_metadata = sql_mdm.get_transformed_data()
+        metadata['sql'] = sql_metadata
     else:
         metadata = generate_metadata(num_buckets=3, num_blobs=100, num_targets=4, num_nodes=16)
     return jsonify(metadata)
