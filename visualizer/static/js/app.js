@@ -905,22 +905,23 @@ function generate_metadata(data) {
 
 function addBlobBucket(blob, bucket, id, x, y) {
     let key = `${blob}-${bucket}`;
+    console.log("key", key);
     lookup[key] = { id, x, y };
 }
 
 function getBlobBucketInfo(blob, bucket) {
     let key = `${blob}-${bucket}`;
+    console.log("key", key);
     return lookup[key]; // This will return undefined if the key does not exist
 }
 
 function draw_row(nodeName, actual_steps, i, stepData){
-    console.log("StepData", stepData)
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
 
-    const blobDiameter = 15;
+    const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
     const textPadding = 10; // Padding between blob and its text label
 
@@ -949,28 +950,27 @@ function draw_row(nodeName, actual_steps, i, stepData){
             let textX = blobX + blobDiameter / 2; // Center text under the blob
 
             // Draw min ellipse
+            let y_blob_padding = 15;
             fill('green');
-            ellipse(blobX, y + metadata_cell_height / 2 - 15, blobDiameter);
+            ellipse(blobX, y + metadata_cell_height / 2 - y_blob_padding, blobDiameter);
             // Draw max ellipse
             fill('red');
-            ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2, blobDiameter);
+            ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2 - y_blob_padding, blobDiameter);
 
             let minBlob;
             let maxBlob;
-            console.log(variableData.min)
-            console.log(variableData.max)
             // Ensure text fits and is centered
             textSize(10); // Smaller text size for better fit
             textAlign(CENTER, TOP); // Center text horizontally and align to top vertically
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 - 15 + blobDiameter / 2);
+                text(minBlob.id.toString(), blobX + textwidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
 
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 - 15 + blobDiameter / 2);
+                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding + textwidth(minBlob.id.toString())/2, y + metadata_cell_height / 2 - y_blob_padding + blobDiameter / 2);
 
             }
             // Variable name text
