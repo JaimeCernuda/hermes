@@ -901,12 +901,16 @@ function generate_metadata(data) {
 
     // Handle the global node similarly
     let globalData = data['global'];
-    for (let j = 0; j < selectedSteps.length; j++) {
-        let step = selectedSteps[j];
-        if (globalData.hasOwnProperty(step)) {
-            let stepIndex = actual_steps.indexOf(step);
-            rect(left_margin + nodeNames.length * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+    if (globalData) {
+        for (let j = 0; j < selectedSteps.length; j++) {
+            let step = selectedSteps[j];
+            if (globalData.hasOwnProperty(step)) {
+                let stepIndex = actual_steps.indexOf(step);
+                rect(left_margin + nodeNames.length * cell_width_metadata, start_y + stepIndex * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+            }
         }
+    } else {
+    console.error("Global data is undefined");
     }
 
     // Draw the row labels using actual_steps
