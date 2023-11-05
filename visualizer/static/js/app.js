@@ -934,52 +934,6 @@ push();
         });
     }
 
-    let nodeName = "global";
-
-    // Draw column labels
-    fill('black');
-    noStroke();
-    textAlign(CENTER, CENTER);
-    text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
-
-    let stepData = data[nodeName];
-
-    selectedSteps.forEach(step => {
-        let key = step.toString();
-        if (stepData && stepData.hasOwnProperty(key)) {
-            actual_steps.push(step);
-            let y = start_y + actual_steps.indexOf(step) * metadata_cell_height;
-
-            // Draw rectangles for each step
-            fill(200);
-            stroke(0);
-            rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
-
-            Object.keys(stepData[key]).forEach((variable, varIndex) => {
-                let variableData = stepData[key][variable];
-                let blobX = left_margin + i * cell_width_metadata + varIndex * 20; // Space out blobs horizontally
-
-                // Draw min ellipse
-                fill(100);
-                ellipse(blobX, y + metadata_cell_height / 2, 15);
-                fill('white');
-                text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, blobX, y + metadata_cell_height / 2);
-
-                // Draw max ellipse
-                fill(150);
-                ellipse(blobX + 10, y + metadata_cell_height / 2, 15);
-                fill('white');
-                text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, blobX + 10, y + metadata_cell_height / 2);
-
-                // Draw variable name
-                fill('black');
-                noStroke();
-                textSize(10);
-                text(variable, blobX + 5, y + metadata_cell_height);
-            });
-        }
-    });
-
     draw_metadata_row_labels(start_y, actual_steps);
 
     pop();
