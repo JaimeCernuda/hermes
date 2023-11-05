@@ -488,39 +488,43 @@ function displayBlobDetails(blob, index, nodes) {
         text(`Bucket: ${blob.bucketName}`, x + 10, y + 140);
     }
 
-    // text(`prev ID: ${prev_data.blobs[index].id}`, x + 10, y + 160);
-    text(`prev target: ${prev_data.blobs[index].buffer_info.target_id}`, x + 10, y + 160);
-
-    // Draw arrow for movement
-    let prevTargetPosition = getTargetPosition(nodes, prev_data.blobs[index].buffer_info.target_id);
-    let blobX = mouseX + 10;  // This is the X-coordinate of the blob
-    let blobY = mouseY;      // This is the Y-coordinate of the blob
-
-    let startX, startY;
-
-    if (prevTargetPosition.x > blobX) { // Target is to the right
-        startX = blobX + width;  // right center
-        startY = blobY + height / 2;
-    } else if (prevTargetPosition.x < blobX) { // Target is to the left
-        startX = blobX; // left center
-        startY = blobY + height / 2;
-    } else if (prevTargetPosition.y < blobY) { // Target is above
-        startX = blobX + width / 2;
-        startY = blobY; // top center
-    } else { // Target is below
-        startX = blobX + width / 2;
-        startY = blobY + height; // bottom center
+    if (!prev_data || !prev_data.blobs || !prev_data.blobs[index] || !prev_data.blobs[index].buffer_info) {
+        console.log("Probably the first step");
     }
+    else {// text(`prev ID: ${prev_data.blobs[index].id}`, x + 10, y + 160);
+        text(`prev target: ${prev_data.blobs[index].buffer_info.target_id}`, x + 10, y + 160);
 
-    stroke(255, 0, 0);  // Red color for the arrow
-    strokeWeight(2);
-    line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
+        // Draw arrow for movement
+        let prevTargetPosition = getTargetPosition(nodes, prev_data.blobs[index].buffer_info.target_id);
+        let blobX = mouseX + 10;  // This is the X-coordinate of the blob
+        let blobY = mouseY;      // This is the Y-coordinate of the blob
 
-    // Draw the arrowhead (feel free to adjust the size or shape)
-    const arrowSize = 5;
-    const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
-    line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
-    line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
+        let startX, startY;
+
+        if (prevTargetPosition.x > blobX) { // Target is to the right
+            startX = blobX + width;  // right center
+            startY = blobY + height / 2;
+        } else if (prevTargetPosition.x < blobX) { // Target is to the left
+            startX = blobX; // left center
+            startY = blobY + height / 2;
+        } else if (prevTargetPosition.y < blobY) { // Target is above
+            startX = blobX + width / 2;
+            startY = blobY; // top center
+        } else { // Target is below
+            startX = blobX + width / 2;
+            startY = blobY + height; // bottom center
+        }
+
+        stroke(255, 0, 0);  // Red color for the arrow
+        strokeWeight(2);
+        line(startX, startY, prevTargetPosition.x, prevTargetPosition.y);
+
+        // Draw the arrowhead (feel free to adjust the size or shape)
+        const arrowSize = 5;
+        const angle = atan2(startY - prevTargetPosition.y, startX - prevTargetPosition.x);
+        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle + PI / 6), prevTargetPosition.y + arrowSize * sin(angle + PI / 6));
+        line(prevTargetPosition.x, prevTargetPosition.y, prevTargetPosition.x + arrowSize * cos(angle - PI / 6), prevTargetPosition.y + arrowSize * sin(angle - PI / 6));
+    }
 
     pop();
 }
