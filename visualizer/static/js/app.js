@@ -922,7 +922,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
     const blobDiameter = 15;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 4; // Padding between blob and its text label
+    const textPadding = 10; // Padding between blob and its text label
 
 
     push();
@@ -950,7 +950,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
             // Draw min ellipse
             fill('green');
-            ellipse(blobX, y + metadata_cell_height / 2, blobDiameter);
+            ellipse(blobX, y + metadata_cell_height / 2 - 15, blobDiameter);
             // Draw max ellipse
             fill('red');
             ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2, blobDiameter);
@@ -965,12 +965,12 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+                text(minBlob.id.toString(), textX, y + metadata_cell_height / 2 - 15 + blobDiameter / 2);
 
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+                text(maxBlob.id.toString(), textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 - 15 + blobDiameter / 2);
 
             }
             // Variable name text

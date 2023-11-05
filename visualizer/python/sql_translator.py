@@ -71,37 +71,38 @@ class SQLParser:
                 if step not in global_results:
                     global_results[step] = {}
                 for var_name, var_data in variables.items():
-                    op_name = next(iter(var_data))  # 'min' or 'max'
-                    value = var_data[op_name]['value']
-                    # Initialize if not already
                     if var_name not in global_results[step]:
-                        global_results[step][var_name] = {
-                            op_name: {
-                                'blob': var_data[op_name]['blob'],
-                                'bucket': var_data[op_name]['bucket'],
-                                'value': value
-                            }
-                        }
-                    else:
-                        # Aggregate the global min and max
-                        if op_name == 'min':
-                            if global_results[step][var_name][op_name]['value']  > value:
-                                global_results[step][var_name] = {
-                                    op_name: {
-                                        'blob': var_data[op_name]['blob'],
-                                        'bucket': var_data[op_name]['bucket'],
-                                        'value': value
-                                    }
+                        global_results[step][var_name] = {}
+                    for op_name, op_data in var_data.items():
+                        value = op_data['value']
+                        # Initialize if not already
+                        if op_name not in global_results[step][op_name]:
+                            base_blob = {
+                                    'blob': var_data[op_name]['blob'],
+                                    'bucket': var_data[op_name]['bucket'],
+                                    'value': value
                                 }
-                        elif op_name == 'max':
-                            if global_results[step][var_name][op_name]['value'] < value:
-                                global_results[step][var_name] = {
-                                    op_name: {
-                                        'blob': var_data[op_name]['blob'],
-                                        'bucket': var_data[op_name]['bucket'],
-                                        'value': value
+                            global_results[step][var_name][op_name] = base_blob
+                        else:
+                            # Aggregate the global min and max
+                            if op_name == 'min':
+                                if global_results[step][var_name][op_name]['value']  > value:
+                                    global_results[step][var_name] = {
+                                        op_name: {
+                                            'blob': var_data[op_name]['blob'],
+                                            'bucket': var_data[op_name]['bucket'],
+                                            'value': value
+                                        }
                                     }
-                                }
+                            elif op_name == 'max':
+                                if global_results[step][var_name][op_name]['value'] < value:
+                                    global_results[step][var_name] = {
+                                        op_name: {
+                                            'blob': var_data[op_name]['blob'],
+                                            'bucket': var_data[op_name]['bucket'],
+                                            'value': value
+                                        }
+                                    }
 
         # Append the global results to transformed_data
         transformed_data['global'] = global_results
