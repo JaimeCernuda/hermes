@@ -880,6 +880,7 @@ function generate_metadata(data) {
 
     let actual_steps = [];
     textSize(14);
+    console.log("data", data)
 
     if(data["global"]) {
         let stepData = data["global"];
