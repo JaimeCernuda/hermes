@@ -49,7 +49,7 @@ let blob_amt = 0.05;
 let img;
 let lowerChoice = "Heatmap"
 let selectedSteps = [1,2,3,4]
-let limitSteps = 8
+let limitSteps = 6
 let input_step_focus
 let blobPositionMap = new Map();
 let lookup = {};
@@ -871,7 +871,7 @@ function draw_metadata_row_labels(start_y, labels) {
 
 function generate_metadata(data) {
     push();
-    let metadata_cell_height = cell_height / 2;
+    let metadata_cell_height = cell_height / (limitSteps/4);
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = height - bottom_margin - metadata_height;
@@ -923,7 +923,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
 
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 2; // Padding between blob and its text label
+    const textPadding = 10; // Padding between blob and its text label
 
 
     push();
@@ -968,7 +968,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString()) / 2, blobY + 5);
+                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString()), blobY + blobDiameter/2);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                         draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                     }
@@ -977,7 +977,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString()) / 2, blobY + 5);
+                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString()), blobY + blobDiameter/2);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
@@ -987,7 +987,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX - blobDiameter / 2 + 5, y + metadata_cell_height - textPadding);
+            text(variable, blobX - blobDiameter / 2 + 5, blobY - textPadding);
         });
     });
     pop();
