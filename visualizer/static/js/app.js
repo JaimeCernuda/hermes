@@ -868,7 +868,7 @@ function draw_metadata_row_labels(start_y, labels) {
     pop();
 }
 
-function generate_metadata(data, selectedSteps, getBlobBucketInfo) {
+function generate_metadata(data) {
     push();
     let nodeNames = Object.keys(data).filter(name => name.startsWith('ares-comp-')); // Assumes all nodes start with 'ares-comp-'
     let metadata_cell_height = cell_height / 2;
@@ -890,7 +890,7 @@ function generate_metadata(data, selectedSteps, getBlobBucketInfo) {
         text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - 5);
 
         if (!Array.isArray(selectedSteps)) {
-            console.error('selectedSteps is not an array:', selectedSteps);
+            console.log("Selected Steps Updated:", selectedSteps);
             return; // Exit the function if selectedSteps is not an array
         }
         // Process each step
