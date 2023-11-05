@@ -76,7 +76,7 @@ class SQLParser:
                     for op_name, op_data in var_data.items():
                         value = op_data['value']
                         # Initialize if not already
-                        if op_name not in global_results[step][op_name]:
+                        if op_name not in global_results[step][var_name]:
                             base_blob = {
                                     'blob': var_data[op_name]['blob'],
                                     'bucket': var_data[op_name]['bucket'],
