@@ -417,7 +417,6 @@ function drawBlobs(nodes, blobs) {
             let maxBlobsPerRow = Math.floor(cell_width_blobs / 30);
             let exceededHeight = false;
             let blob_index = 0
-            lookup = {};
 
             blobs.forEach(blob => {
                 // console.log(dropdown_buckets.value(), " ", blobToBucketMap[blob.id].bucketName)
@@ -427,7 +426,6 @@ function drawBlobs(nodes, blobs) {
                 ){
                     let blobX = x + 10 + (blobCol * 30) + blob_stroke_weight/2;
                     let blobY = y + 10 + (blobRow * 30) + blob_stroke_weight/2;
-                    console.log("inserting blob", blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY)
                     addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY);
                     if (blobY + 20 > y + blobTableHeight) {
                         exceededHeight = true;
