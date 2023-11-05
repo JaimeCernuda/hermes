@@ -143,9 +143,9 @@ function setup() {
     input_blob_focus.input(inputBlobEvent);
     input_blob_focus.size(70, 20)
 
-    input_step_focus = createInput('1-4');
-    input_step_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 100);
-    input_step_focus.input(inputStepEvent());
+    input_step_focus = createInput('1-8');
+    input_step_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 300);
+    input_step_focus.input(inputStepEvent);
     input_step_focus.size(70, 20)
 }
 
@@ -189,7 +189,7 @@ function inputBlobEvent() {
 }
 
 function inputStepEvent() {
-    let inputString = this.value(); // This refers to the input element
+    let inputString = input_step_focus.value(); // This refers to the input element
     let parsedNumbers = [];
 
     // Split the input string by commas
