@@ -1,5 +1,6 @@
-import time
+#!/usr/bin/env python3
 
+import time
 from flask import Flask, render_template, jsonify, url_for
 from python.generator import generate_metadata
 from python.hermes_translator import MetadataSnapshot
