@@ -870,24 +870,14 @@ function draw_metadata_row_labels(start_y, labels) {
 }
 
 function generate_metadata(data) {
-push();
+    push();
     let nodeNames = Object.keys(data);
-    let metadata_cell_height = cell_height / 2;
-    let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
-    let metadata_height = limitSteps * metadata_cell_height;
-    let start_y = height - bottom_margin - metadata_height;
-    let actual_steps = [];
 
+    let actual_steps = [];
     textSize(14);
 
-    for (let i = 0; i < HEATMAP_NODES; i++) {
-        let nodeName = nodeNames[i];
-        fill('black');
-        noStroke();
-        textAlign(CENTER, CENTER);
-        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
-
-        let stepData = data[nodeName];
+    if(data["global"]) {
+        let stepData = data["global"];
         selectedSteps.forEach(step => {
             let key = step.toString();
             if (stepData && stepData.hasOwnProperty(key) && !actual_steps.includes(step)) {
@@ -895,45 +885,13 @@ push();
             }
         });
 
-        actual_steps.forEach((step, index) => {
-            let y = start_y + index * metadata_cell_height;
-            fill(200);
-            stroke(0);
-            rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
 
-            let stepVariables = stepData[step];
-            let variablesKeys = Object.keys(stepVariables);
-            let spacing = cell_width_metadata / variablesKeys.length; // Dynamic spacing based on number of variables
-
-            variablesKeys.forEach((variable, varIndex) => {
-                let variableData = stepVariables[variable];
-                let baseX = left_margin + i * cell_width_metadata + varIndex * spacing;
-                let blobX = baseX + spacing / 4; // Adjust spacing for the blobs
-                let textX = blobX + spacing / 2; // Center text under the blobs
-
-                // Draw min ellipse
-                fill('skyblue'); // Choose a more interesting color
-                ellipse(blobX, y + metadata_cell_height / 2, 15);
-                fill('white');
-                textSize(10); // Ensure text size is set before drawing text
-                text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, textX, y + metadata_cell_height - 10);
-
-                // Draw max ellipse
-                fill('salmon'); // Choose a different color for max
-                ellipse(blobX + spacing / 2, y + metadata_cell_height / 2, 15);
-                fill('white');
-                textSize(10);
-                text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, textX, y + metadata_cell_height);
-
-                // Draw variable name
-                fill('black');
-                noStroke();
-                textSize(12);
-                text(variable, textX, y - 10); // Adjust the y value to draw the name above the circles
-            });
-        });
+        for (let i = 0; i < HEATMAP_NODES; i++) {
+            let nodeName = nodeNames[i];
+            draw_row(nodeName, actual_steps, i)
+        }
+        draw_row("global", actual_steps, HEATMAP_NODES + 1);
     }
-
     draw_metadata_row_labels(start_y, actual_steps);
 
     pop();
@@ -947,4 +905,62 @@ function addBlobBucket(blob, bucket, id, x, y) {
 function getBlobBucketInfo(blob, bucket) {
     let key = `${blob}-${bucket}`;
     return lookup[key]; // This will return undefined if the key does not exist
+}
+
+function draw_row(nodeName, actual_steps, i){
+    let metadata_cell_height = cell_height / 2;
+    let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
+    let metadata_height = limitSteps * metadata_cell_height;
+    let start_y = height - bottom_margin - metadata_height;
+
+    const blobDiameter = 15;
+    const blobPadding = 10; // Padding between the two blobs
+    const textPadding = 4; // Padding between blob and its text label
+
+
+    push();
+    fill('black');
+    noStroke();
+    textAlign(CENTER, CENTER);
+    text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2, start_y - metadata_cell_height / 2);
+
+    actual_steps.forEach((step, index) => {
+        let y = start_y + index * metadata_cell_height;
+        fill(200);
+        stroke(0);
+        rect(left_margin + i * cell_width_metadata, y, cell_width_metadata, metadata_cell_height);
+
+        let stepVariables = stepData[step];
+        let variablesKeys = Object.keys(stepVariables);
+        let spacing = cell_width_metadata / variablesKeys.length; // Dynamic spacing based on number of variables
+
+        variablesKeys.forEach((variable, varIndex) => {
+            let variableData = stepData[key][variable];
+            // Center the pair of blobs + text in the middle of the cell
+            let blobGroupWidth = blobDiameter * 2 + blobPadding;
+            let blobX = left_margin + i * cell_width_metadata + (cell_width_metadata - blobGroupWidth) / 2 + varIndex * (blobGroupWidth + textPadding);
+            let textX = blobX + blobDiameter / 2; // Center text under the blob
+
+            // Draw min ellipse
+            fill(100);
+            ellipse(blobX, y + metadata_cell_height / 2, blobDiameter);
+            // Draw max ellipse
+            fill(150);
+            ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2, blobDiameter);
+
+            // Ensure text fits and is centered
+            textSize(10); // Smaller text size for better fit
+            textAlign(CENTER, TOP); // Center text horizontally and align to top vertically
+            fill('white');
+            text(getBlobBucketInfo(variableData.min.blob, variableData.min.bucket).id, textX, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+            text(getBlobBucketInfo(variableData.max.blob, variableData.max.bucket).id, textX + blobDiameter + blobPadding, y + metadata_cell_height / 2 + blobDiameter / 2 + 2);
+
+            // Variable name text
+            fill('black');
+            textSize(10);
+            textAlign(LEFT, BOTTOM);
+            text(variable, blobX - blobDiameter / 2, y + metadata_cell_height - textPadding);
+        });
+    });
+    pop();
 }
