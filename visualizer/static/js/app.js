@@ -967,16 +967,20 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('white');
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-                text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY + 5);
-                if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
-                    draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
+                if(minBlob) {
+                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString()) / 2, blobY + 5);
+                    if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
+                        draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
+                    }
                 }
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
-                text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2, blobY + 5);
-                if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
-                    draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
+                if(maxBlob) {
+                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString()) / 2, blobY + 5);
+                    if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
+                        draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
+                    }
                 }
             }
             // Variable name text
