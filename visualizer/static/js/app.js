@@ -428,10 +428,14 @@ function drawBlobs(nodes, blobs) {
                 ){
                     let blobX = x + 10 + (blobCol * 30) + blob_stroke_weight/2;
                     let blobY = y + 10 + (blobRow * 30) + blob_stroke_weight/2;
-                    addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY);
+
                     if (blobY + 20 > y + blobTableHeight) {
                         exceededHeight = true;
+                        addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, x + cell_width_blobs/2, blobY);
                         return;
+                    }
+                    else{
+                        addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY);
                     }
 
                     if (!exceededHeight) {
@@ -965,7 +969,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2 + 3, blobY - blobDiameter/2);
+                    text(minBlob.id.toString(), blobX - textWidth(minBlob.id.toString())/2, blobY);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
                         draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
                     }
@@ -974,7 +978,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2 + 3, blobY - blobDiameter/2);
+                    text(maxBlob.id.toString(), blobX2 - textWidth(minBlob.id.toString())/2, blobY);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
@@ -984,7 +988,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             fill('black');
             textSize(10);
             textAlign(LEFT, BOTTOM);
-            text(variable, blobX - blobDiameter / 2 + 15, blobY + textPadding);
+            text(variable, blobX + blobDiameter/2 + blobPadding/2 - textWidth(variable) , blobY + blobDiameter/2 + textPadding);
         });
     });
     pop();
