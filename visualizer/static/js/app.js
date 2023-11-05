@@ -871,8 +871,8 @@ function draw_metadata_row_labels(start_y, labels, metadata_cell_height) {
 
 function generate_metadata(data) {
     push();
-    let metadata_cell_height = cell_height/1.75;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
+    let metadata_cell_height = cell_height/1.75;
     let metadata_height = limitSteps * metadata_cell_height;
     let start_y = WINDOW_HEIGHT - bottom_margin - metadata_height;
 
