@@ -953,12 +953,16 @@ function draw_row(nodeName, actual_steps, i, stepData){
             fill('red');
             ellipse(blobX + blobDiameter + blobPadding, y + metadata_cell_height / 2, blobDiameter);
 
+            let minBlob;
+            let maxBlob;
             console.log(variableData.min)
             console.log(variableData.max)
-            if(variableData.min)
-                let minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
-            if(variableData.max)
-                let maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
+            if(variableData.min) {
+                minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
+            }
+            if(variableData.max) {
+                maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
+            }
 
             // Ensure text fits and is centered
             textSize(10); // Smaller text size for better fit
