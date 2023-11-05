@@ -35,7 +35,7 @@ def index():
     return render_template('index.html', image_url1=image_url1, image_url2=image_url2)
 
 @app.route('/empress_metadata')
-def get_metadata():
+def get_empress_metadata():
     time.sleep(args.sleep_time)
     if args.real:
         mdm = SQLParser(args.db_path, args.hostfile)
