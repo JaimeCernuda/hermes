@@ -971,7 +971,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
                 if(minBlob) {
                     text(minBlob.id.toString(), blobX - 1, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
-                        draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y - 10)
+                        draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y + 10)
                     }
                 }
             }
@@ -980,7 +980,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
                 if(maxBlob) {
                     text(maxBlob.id.toString(), blobX2 - 1, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
-                        draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
+                        draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y + 10)
                     }
                 }
             }
