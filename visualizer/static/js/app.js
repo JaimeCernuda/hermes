@@ -427,6 +427,7 @@ function drawBlobs(nodes, blobs) {
                 ){
                     let blobX = x + 10 + (blobCol * 30) + blob_stroke_weight/2;
                     let blobY = y + 10 + (blobRow * 30) + blob_stroke_weight/2;
+                    console.log("inserting blob", blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY)
                     addBlobBucket(blob.name, blobToBucketMap[blob.id].bucketName, blob.id, blobX, blobY);
                     if (blobY + 20 > y + blobTableHeight) {
                         exceededHeight = true;
@@ -905,7 +906,8 @@ function generate_metadata(data) {
                         // Get info for min and max
                         let minInfo = getBlobBucketInfo(varData.min.blob, varData.min.bucket);
                         let maxInfo = getBlobBucketInfo(varData.max.blob, varData.max.bucket);
-
+                        console.log("minInfo:", minInfo);
+                        console.log("MaxInfo:", maxInfo);
                         // Draw circles and text for min and max
                         let yPos = start_y + index * metadata_cell_height + metadata_cell_height / 2;
 
