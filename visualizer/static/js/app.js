@@ -924,7 +924,7 @@ function getBlobBucketInfo(blob, bucket) {
 function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cell_width_metadata, metadata_height, start_y){
     const blobDiameter = 20;
     const blobPadding = 10; // Padding between the two blobs
-    const textPadding = 12; // Padding between blob and its text label
+    const textPadding = 11; // Padding between blob and its text label
 
 
     push();
@@ -952,7 +952,7 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             let textX = blobX + blobDiameter / 2; // Center text under the blob
 
             // Draw min ellipse
-            let y_blob_padding = 3;
+            let y_blob_padding = 2;
             let blobY = y + metadata_cell_height / 2 - y_blob_padding;
             fill('green');
             ellipse(blobX, blobY, blobDiameter);
@@ -969,16 +969,16 @@ function draw_row(nodeName, actual_steps, i, stepData, metadata_cell_height, cel
             if(variableData.min) {
                 minBlob = getBlobBucketInfo(variableData.min.blob, variableData.min.bucket);
                 if(minBlob) {
-                    text(minBlob.id.toString(), blobX - 2, blobY - 3.5);
+                    text(minBlob.id.toString(), blobX - 1, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX, blobY) <= 10) {
-                        draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y)
+                        draw_blob_arrow(blobX, blobY, minBlob.x, minBlob.y - 10)
                     }
                 }
             }
             if(variableData.max) {
                 maxBlob = getBlobBucketInfo(variableData.max.blob, variableData.max.bucket);
                 if(maxBlob) {
-                    text(maxBlob.id.toString(), blobX2 - 2, blobY - 3.5);
+                    text(maxBlob.id.toString(), blobX2 - 1, blobY - 3.5);
                     if (dist(mouseX, mouseY, blobX2, blobY) <= 10) {
                         draw_blob_arrow(blobX2, blobY, maxBlob.x, maxBlob.y)
                     }
