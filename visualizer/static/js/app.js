@@ -48,6 +48,9 @@ let blob_amt = 0.05;
 
 let img;
 let lowerChoice = "Heatmap"
+let selectedSteps = [1,2,3,4]
+let limitSteps = 8
+let input_step_focus
 
 const TARGET_COLORS = [
     "#00d4ff",
@@ -139,6 +142,11 @@ function setup() {
     input_blob_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 10);
     input_blob_focus.input(inputBlobEvent);
     input_blob_focus.size(70, 20)
+
+    input_step_focus = createInput('1-4');
+    input_step_focus.position(checkbox_focus_blobs.x, checkbox_focus_blobs.y + checkbox_focus_blobs.height + 100);
+    input_step_focus.input(inputStepEvent());
+    input_step_focus.size(70, 20)
 }
 
 function selectMode(){
@@ -178,6 +186,44 @@ function inputBlobEvent() {
     focusedBlobs = parsedNumbers;
 
     console.log(focusedBlobs); // For debugging
+}
+
+function inputStepEvent() {
+    let inputString = this.value(); // This refers to the input element
+    let parsedNumbers = [];
+
+    // Split the input string by commas
+    let components = inputString.split(",");
+
+    components.forEach(component => {
+        // Check if the component has a '-'
+        if (component.includes("-")) {
+            // Extract start and end of the range
+            let [start, end] = component.split("-").map(Number);
+
+            if (isNaN(start) || isNaN(end)) {
+                // If either value is NaN, skip this segment
+                return;
+            }
+
+            // Generate and push all numbers in the range to parsedNumbers
+            for (let i = start; i <= end; i++) {
+                parsedNumbers.push(i);
+            }
+        } else {
+            // Directly push the number to parsedNumbers
+            parsedNumbers.push(Number(component));
+        }
+    });
+
+    // Update focusedBlobs array
+    trimArray(parsedNumbers, limitSteps);
+    selectedSteps = parsedNumbers;
+}
+
+function trimArray(arr, n) {
+  // If the array length is greater than n, slice it. Otherwise, return it as is.
+  return arr.length > n ? arr.slice(0, n) : arr;
 }
 
 function checkboxFocusBucketEvent() {
@@ -248,7 +294,7 @@ function draw() {
                 generate_heatmap(data.nodes);
             }
             if(lowerChoice === "Metadata") {
-                // generate_heatmap(data.nodes);
+                generate_metadata(data.sql);
             }
         }
         drawBlobs(data.nodes, data.blobs);
@@ -803,5 +849,72 @@ function generate_heatmap(data) {
     textSize(14);
     text("0", gradient_bar_x - textWidth("0") - 5, gradient_bar_y + gradient_bar_height / 2 + 6);
     text("1", gradient_bar_x + gradient_bar_width + 5, gradient_bar_y + gradient_bar_height / 2 + 6);
+    pop();
+}
+
+function draw_metadata_row_labels(start_y, labels) {
+    push();
+    fill(0);
+    noStroke();
+    textSize(14);
+    for (let i = 0; i < labels.length; i++) {
+        //textAlign(CENTER, CENTER);
+        text('step ' + labels[i].toString(), left_margin - 30 - textWidth(labels[i]) / 2, start_y + i * cell_height + cell_height / 2);
+    }
+    pop();
+}
+
+function generate_metadata(data) {
+    push();
+    let nodeNames = Object.keys(data);
+    let metadata_cell_height = cell_height/2;
+    let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
+    let metadata_height = limitSteps * metadata_cell_height;
+    let start_y = height - bottom_margin - metadata_height;
+    let actual_steps = [];
+
+    // Loop over the top NUM_NODES nodes
+    for (let i = 0; i < HEATMAP_NODES; i++) {
+        let nodeName = nodeNames[i]
+        // Draw column labels
+        fill('black');  // Set text color to black
+        textSize(14);
+        noStroke();
+        text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
+
+        let stepData = data[nodeName];
+        for (let step in selectedSteps) {
+            // let target = nodeData[key];
+            // let value = target.cap
+            key = step.toString();
+            if(stepData[key]) {
+                actual_steps.push(step);
+                rect(left_margin + i * cell_width_metadata, start_y + Object.keys(stepData).indexOf(key) * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+            }
+        }
+    }
+
+    let nodeName = "global";
+    // Draw column labels
+    fill('black');  // Set text color to black
+    textSize(14);
+    noStroke();
+    text(nodeName, left_margin + i * cell_width_metadata + cell_width_metadata / 2 - textWidth(nodeName) / 2, start_y - 5);
+
+    let stepData = data[nodeName];
+    for (let step in selectedSteps) {
+        // let target = nodeData[key];
+        // let value = target.cap
+        key = step.toString();
+        if(stepData[key]) {
+            actual_steps.push(step);
+            rect(left_margin + i * cell_width_metadata, start_y + Object.keys(stepData).indexOf(key) * metadata_cell_height, cell_width_metadata, metadata_cell_height);
+        }
+    }
+
+    draw_metadata_row_labels(start_y, actual_steps);
+
+
+
     pop();
 }
