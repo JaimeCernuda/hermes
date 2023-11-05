@@ -894,9 +894,9 @@ function generate_metadata(data) {
 
         for (let i = 0; i < HEATMAP_NODES; i++) {
             let nodeName = nodeNames[i];
-            draw_row(nodeName, actual_steps, i, stepData)
+            draw_row(nodeName, actual_steps, i, data[nodeName])
         }
-        draw_row("global", actual_steps, HEATMAP_NODES, stepData);
+        draw_row("global", actual_steps, HEATMAP_NODES, data["global"]);
     }
     draw_metadata_row_labels(start_y, actual_steps);
 
