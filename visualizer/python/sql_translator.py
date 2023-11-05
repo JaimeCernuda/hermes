@@ -1,32 +1,86 @@
-import sqlite3
-import pandas as pd
+from jarvis_util import *
+import json
+from collections import defaultdict
 
+class SQLParser:
+    def __init__(self, db_path, hostfile):
+        self.db_path = db_path
+        self.hostfile = hostfile
 
-def get_latest_entries(db_path, table_name, n):
-    conn = sqlite3.connect(db_path)
-    query = f"SELECT * FROM {table_name} ORDER BY rowid DESC LIMIT {n};"
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-    return df
+    def exec_on_nodes(self):
+        #cmd = f'sqlite3 {self.db_path} \'SELECT step, variable, operation, blob_name, bucket_name, value FROM derived_targets;\''
+        #cmd = f'sqlite3 -help'
+        cmd = f'/home/jcernudagarcia/jarvis-jaime/jarvis-util/bin/query.sh {self.db_path}'
 
+        print(cmd)
+        pssh_info = PsshExecInfo(hostfile=self.hostfile, collect_output=True)
+        exec_result = Exec(cmd, pssh_info)
+        return exec_result
 
-if __name__ == "__main__":
-    db_path = "path_to_your_database.db"  # Replace with the path to your SQLite database
-    n = 5  # Number of latest entries to retrieve
+    def fetch_data_from_nodes(self):
+        node_outputs = self.exec_on_nodes()
+        all_data = {}
+        for node_name, node_output in node_outputs.stdout.items():
+            all_data[node_name] = self.parse_node_output(node_output)
+        return all_data
 
-    # Apps Table
-    apps_latest_entries = get_latest_entries(db_path, "Apps", n)
-    print("Apps Table - Latest Entries:")
-    print(apps_latest_entries)
-    print("\n")
+    def parse_node_output(self, output):
+        rows = [line.split('|') for line in output.strip().split('\n')]
+        return rows
 
-    # BlobLocations Table
-    blob_locations_latest_entries = get_latest_entries(db_path, "BlobLocations", n)
-    print("BlobLocations Table - Latest Entries:")
-    print(blob_locations_latest_entries)
-    print("\n")
+    def transform_data(self, data):
+        output = {}
+        for row in data:
+            step, variable, operation, blob_name, bucket_name, value = row
+            step = int(step)  # convert step to int
+            value = float(value)  # convert value to float
 
-    # VariableMetadataTable
-    variable_metadata_latest_entries = get_latest_entries(db_path, "VariableMetadataTable", n)
-    print("VariableMetadataTable - Latest Entries:")
-    print(variable_metadata_latest_entries)
+            if step not in output:
+                output[step] = {}
+
+            if variable not in output[step]:
+                output[step][variable] = {}
+
+            output[step][variable][operation] = {
+                'blob': blob_name,
+                'bucket': bucket_name,
+                'value': value
+            }
+        return output
+
+    def get_transformed_data(self):
+        raw_data = self.fetch_data_from_nodes()
+        transformed_data = {node: self.transform_data(rows) for node, rows in raw_data.items()}
+        return self.append_global_results(transformed_data)
+
+    def append_global_results(self, transformed_data):
+        global_results = {}
+        # Iterate over each step in each node to gather global min and max
+        for node_id, steps in transformed_data.items():
+            for step, variables in steps.items():
+                if step not in global_results:
+                    global_results[step] = {}
+                for var_name, var_data in variables.items():
+                    op_name = next(iter(var_data))  # 'min' or 'max'
+                    value = var_data[op_name]['value']
+                    # Initialize if not already
+                    if var_name not in global_results[step]:
+                        global_results[step][var_name] = {
+                            op_name: {
+                                'blob': var_data[op_name]['blob'],
+                                'bucket': var_data[op_name]['bucket'],
+                                'value': value
+                            }
+                        }
+                    else:
+                        # Aggregate the global min and max
+                        if op_name == 'min':
+                            global_results[step][var_name][op_name]['value'] = min(
+                                global_results[step][var_name][op_name]['value'], value)
+                        elif op_name == 'max':
+                            global_results[step][var_name][op_name]['value'] = max(
+                                global_results[step][var_name][op_name]['value'], value)
+
+        # Append the global results to transformed_data
+        transformed_data['global'] = global_results
+        return transformed_data
