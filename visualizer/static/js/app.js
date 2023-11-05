@@ -940,7 +940,7 @@ function draw_row(nodeName, actual_steps, i, stepData){
         let spacing = cell_width_metadata / variablesKeys.length; // Dynamic spacing based on number of variables
 
         variablesKeys.forEach((variable, varIndex) => {
-            let variableData = stepData[key][variable];
+            let variableData = stepVariables[variable];
             // Center the pair of blobs + text in the middle of the cell
             let blobGroupWidth = blobDiameter * 2 + blobPadding;
             let blobX = left_margin + i * cell_width_metadata + (cell_width_metadata - blobGroupWidth) / 2 + varIndex * (blobGroupWidth + textPadding);
