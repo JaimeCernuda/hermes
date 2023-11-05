@@ -893,7 +893,7 @@ function generate_metadata(data) {
 
         for (let i = 0; i < HEATMAP_NODES; i++) {
             let nodeName = nodeNames[i];
-            draw_row(nodeName, actual_steps, i)
+            draw_row(nodeName, actual_steps, i, stepData)
         }
         draw_row("global", actual_steps, HEATMAP_NODES + 1);
     }
@@ -912,7 +912,7 @@ function getBlobBucketInfo(blob, bucket) {
     return lookup[key]; // This will return undefined if the key does not exist
 }
 
-function draw_row(nodeName, actual_steps, i){
+function draw_row(nodeName, actual_steps, i, stepData){
     let metadata_cell_height = cell_height / 2;
     let cell_width_metadata = cell_width_heatmap * HEATMAP_NODES / (HEATMAP_NODES + 1);
     let metadata_height = limitSteps * metadata_cell_height;
