@@ -135,7 +135,7 @@ class MetadataSnapshot:
                 "name": tag["name"],
                 "id": int(tag["id"].split('.')[1]),  # Convert id to int after the dot
                 "traits": [],
-                "blobs": [int(blob.split('.')[1]) for blob in tag["blobs"]]  # Convert each blob id to int after the dot
+                "blobs": [int(''.join(blob["id"].split('.'))) for blob in tag["blobs"]]  # Convert each blob id to int after the dot
             }
             transformed_tags.append(transformed_tag)
 
@@ -147,7 +147,7 @@ class MetadataSnapshot:
         # Iterate over the original blob info and transform
         for blob in self.blob_info:
             transformed_blob = {
-                "id": int(blob["id"].split('.')[1]),  # Convert id to int after the dot
+                "id": int(''.join(blob["id"].split('.'))),  # Convert id to int after the dot
                 "name": blob["name"],  # Keep the name the same
                 "score": float(blob["score"]),  # Keep the score as float
                 "access_frequency": float(blob["access_frequency"]),  # Convert access frequency to float
