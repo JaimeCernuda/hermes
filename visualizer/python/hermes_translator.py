@@ -135,7 +135,7 @@ class MetadataSnapshot:
                 "name": tag["name"],
                 "id": int(tag["id"].split('.')[1]),  # Convert id to int after the dot
                 "traits": [],
-                "blobs": [int(''.join(blob["id"].split('.'))) for blob in tag["blobs"]]  # Convert each blob id to int after the dot
+                "blobs": [int(''.join(blob.split('.'))) for blob in tag["blobs"]]
             }
             transformed_tags.append(transformed_tag)
 
