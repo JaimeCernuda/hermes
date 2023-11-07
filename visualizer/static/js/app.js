@@ -187,7 +187,7 @@ function inputBlobEvent() {
     // Update focusedBlobs array
     focusedBlobs = parsedNumbers;
 
-    console.log(focusedBlobs); // For debugging
+    // console.log(focusedBlobs); // For debugging
 }
 
 function inputStepEvent() {
@@ -911,13 +911,13 @@ function generate_metadata(data) {
 
 function addBlobBucket(blob, bucket, id, x, y) {
     let key = `${blob}-${bucket}`;
-    console.log("key", key);
+    // console.log("key", key);
     lookup[key] = { id, x, y };
 }
 
 function getBlobBucketInfo(blob, bucket) {
     let key = `${blob}-${bucket}`;
-    console.log("key", key);
+    // console.log("key", key);
     return lookup[key]; // This will return undefined if the key does not exist
 }
 

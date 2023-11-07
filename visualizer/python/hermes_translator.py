@@ -147,7 +147,7 @@ class MetadataSnapshot:
         # Iterate over the original blob info and transform
         for blob in self.blob_info:
             transformed_blob = {
-                "id": int(''.join(blob["id"].split('.'))),  # Convert id to int after the dot
+                "id": int(''.join(blob["id"].split('.'))),  # Convert id to int after the dot 1.23 -> 123
                 "name": blob["name"],  # Keep the name the same
                 "score": float(blob["score"]),  # Keep the score as float
                 "access_frequency": float(blob["access_frequency"]),  # Convert access frequency to float
