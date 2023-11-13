@@ -33,15 +33,6 @@ def index():
     image_url2 = url_for('static', filename='assets/grc.jpeg')
     return render_template('index.html', image_url1=image_url1, image_url2=image_url2)
 
-@app.route('/empress_metadata')
-def get_empress_metadata():
-    time.sleep(args.sleep_time)
-    if args.real:
-        mdm = SQLParser(args.db_path, args.hostfile)
-        metadata = mdm.get_transformed_data()
-    else:
-        metadata = []
-    return jsonify(metadata)
 
 @app.route('/metadata')
 def get_metadata():
@@ -49,12 +40,16 @@ def get_metadata():
     if args.real:
         hermes_mdm = MetadataSnapshot(args.hostfile)
         metadata = hermes_mdm.generate_metadata()
-        sql_mdm = SQLParser(args.db_path, args.hostfile)
-        sql_metadata = sql_mdm.get_transformed_data()
-        metadata['sql'] = sql_metadata
+        if args.db_path:
+            sql_mdm = SQLParser(args.db_path, args.hostfile)
+            sql_metadata = sql_mdm.get_transformed_data()
+            metadata['sql'] = sql_metadata
+        else:
+            metadata['sql'] = {}
     else:
         metadata = generate_metadata(num_buckets=3, num_blobs=100, num_targets=4, num_nodes=16)
     return jsonify(metadata)
+
 
 if __name__ == '__main__':
     app.run(port=args.port, debug=True)
