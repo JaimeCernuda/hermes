@@ -3,7 +3,7 @@ import json
 from py_hermes import Hermes, TRANSPARENT_HERMES
 import hashlib
 from jarvis_util import Hostfile
-import base64
+import hashlib
 
 
 class MetadataSnapshot:
@@ -44,7 +44,7 @@ class MetadataSnapshot:
             try:
                 blob_name = str(blob.get_name())
             except:
-                blob_name = str(hash(blob.get_name()))
+                blob_name = hashlib.sha256(blob.get_name()).hexdigest()
             blob_info = {
                 'name': blob_name,
                 'id': self.unique(blob.blob_id),
