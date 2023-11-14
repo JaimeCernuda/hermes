@@ -3,6 +3,8 @@ import json
 from py_hermes import Hermes, TRANSPARENT_HERMES
 import hashlib
 from jarvis_util import Hostfile
+import base64
+
 
 class MetadataSnapshot:
     def __init__(self, hostfile):
@@ -39,8 +41,12 @@ class MetadataSnapshot:
         for i, target in enumerate(self.target_info):
             target['name'] = f'Tier {i}'
         for blob in mdm.blob_info:
+            try:
+                blob_name = str(blob.get_name())
+            except:
+                blob_name = base64.b64encode(blob.get_name()).decode('utf-8')
             blob_info = {
-                'name': str(blob.get_name()),
+                'name': blob_name,
                 'id': self.unique(blob.blob_id),
                 'mdm_node': int(blob.blob_id.node_id),
                 'tag_id': self.unique(blob.tag_id),
