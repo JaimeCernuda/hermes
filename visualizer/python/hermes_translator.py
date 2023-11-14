@@ -45,6 +45,8 @@ class MetadataSnapshot:
                 blob_name = str(blob.get_name())
             except:
                 blob_name = hashlib.sha256(blob.get_name()).hexdigest()
+            if type(blob_name) == list:
+                blob_name = ''.join(blob_name)
             blob_info = {
                 'name': blob_name,
                 'id': self.unique(blob.blob_id),
@@ -67,10 +69,13 @@ class MetadataSnapshot:
                 tag_to_blob[blob_info['tag_id']] = []
             tag_to_blob[blob_info['tag_id']].append(blob_info['id'])
         for tag in mdm.bkt_info:
+            bucket_name = str(tag.get_name())
+            if type(bucket_name) == list:
+                bucket_name = ''.join(bucket_name)
             tag_info = {
                 'id': self.unique(tag.tag_id),
                 'mdm_node': int(tag.tag_id.node_id),
-                'name': str(tag.get_name()),
+                'name': bucket_name,
                 # 'blobs': [self.unique(blob.blob_id) for blob in tag.blobs]
                 'blobs': []
             }
