@@ -44,7 +44,7 @@ class MetadataSnapshot:
             try:
                 blob_name = str(blob.get_name())
             except:
-                blob_name = base64.b64encode(blob.get_name()).decode('utf-8')
+                blob_name = str(hash(blob.get_name))
             blob_info = {
                 'name': blob_name,
                 'id': self.unique(blob.blob_id),
