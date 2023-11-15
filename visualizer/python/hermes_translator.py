@@ -126,6 +126,7 @@ class MetadataSnapshot:
 
     def transform_single_target(self, original, node_index, target_type):
         # Convert the original target to the transformed structure
+        print(original["id"])
         transformed = {
             "name": target_type,
             "id": int(original['id'].split('.')[1]),
@@ -139,6 +140,7 @@ class MetadataSnapshot:
 
         # Iterate over the original tag info and transform
         for tag in self.tag_info:
+            print(tag["id"])
             transformed_tag = {
                 "name": tag["name"],
                 "id": int(tag["id"].split('.')[1]),  # Convert id to int after the dot
