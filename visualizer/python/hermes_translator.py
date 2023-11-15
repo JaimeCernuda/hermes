@@ -117,6 +117,7 @@ class MetadataSnapshot:
         for node_index, targets in targets_by_node.items():
             targets.sort(key=lambda x: x['bandwidth'], reverse=True)
             for i, target in enumerate(targets):
+
                 target_type = self.target_types[i] if i < len(self.target_types) else None
                 if target_type:
                     transformed_target = self.transform_single_target(target, node_index, target_type)
