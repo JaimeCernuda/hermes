@@ -127,7 +127,7 @@ class MetadataSnapshot:
 
     def transform_single_target(self, original, node_index, target_type):
         # Convert the original target to the transformed structure
-        print(original["id"])
+        # print(original["id"])
         transformed = {
             "name": target_type,
             "id": int(original['id'].split('.')[1]),
@@ -141,7 +141,7 @@ class MetadataSnapshot:
 
         # Iterate over the original tag info and transform
         for tag in self.tag_info:
-            print(tag["id"])
+            # print(tag["id"])
             transformed_tag = {
                 "name": tag["name"],
                 "id": int(tag["id"].split('.')[1]),  # Convert id to int after the dot
@@ -157,6 +157,7 @@ class MetadataSnapshot:
 
         # Iterate over the original blob info and transform
         for blob in self.blob_info:
+            print(blob["buffer_info"][0]["target_id"])
             transformed_blob = {
                 "id": int(''.join(blob["id"].split('.'))),  # Convert id to int after the dot 1.23 -> 123
                 "name": blob["name"],  # Keep the name the same
