@@ -157,7 +157,7 @@ class MetadataSnapshot:
 
         # Iterate over the original blob info and transform
         for blob in self.blob_info:
-            print(blob["buffer_info"][0]["target_id"])
+            print(json.dumps(blob, indent=2))
             transformed_blob = {
                 "id": int(''.join(blob["id"].split('.'))),  # Convert id to int after the dot 1.23 -> 123
                 "name": blob["name"],  # Keep the name the same
